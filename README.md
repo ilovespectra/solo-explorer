@@ -1,7 +1,7 @@
 # solo: explorer
 this is a rewrap of Helius Labs' XRAY browser. work in progress for solo: journal app
 
-![solo-explorer]([/doc/xray-cover-gh.jpg](https://cdn.discordapp.com/attachments/1051281685234327613/1168908355083980891/image.png?ex=655379bd&is=654104bd&hm=07586c60a52981c696389ede23c452ed441e1e5d51606685617bfe65e789062f&))
+![solo-explorer](https://cdn.discordapp.com/attachments/1051281685234327613/1168908355083980891/image.png?ex=655379bd&is=654104bd&hm=07586c60a52981c696389ede23c452ed441e1e5d51606685617bfe65e789062f&)
 
 ## Relevant Links
 
