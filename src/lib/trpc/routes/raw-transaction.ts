@@ -2,8 +2,16 @@ import { z } from "zod";
 import { t } from "$lib/trpc/t";
 import { connect } from "$lib/xray";
 
-// Remove the API key since we're using a proxy URL
-// const { HELIUS_API_KEY } = process.env;
+// Use the API key from the environment variables
+const { VITE_HELIUS_API_KEY } = process.env;
+
+// Define the types for GetTransactionConfig or GetVersionedTransactionConfig
+type GetTransactionConfig = {
+    headers: {
+        Authorization: string;
+    };
+    maxSupportedTransactionVersion: number;
+};
 
 export const rawTransaction = t.procedure
     .input(z.string())
@@ -13,9 +21,15 @@ export const rawTransaction = t.procedure
             "https://rpc-proxy.denverhnt.workers.dev"
         );
 
-        const transaction = await connection.getTransaction(input, {
+        // Create a valid config object
+        const config: GetTransactionConfig = {
+            headers: {
+                Authorization: `Bearer ${VITE_HELIUS_API_KEY}`,
+            },
             maxSupportedTransactionVersion: 0,
-        });
+        };
+
+        const transaction = await connection.getTransaction(input, config);
 
         return {
             transaction,
