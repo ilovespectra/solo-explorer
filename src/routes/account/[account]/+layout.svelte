@@ -28,13 +28,13 @@
                 <div />
                 <a
                     href={`/account/${account}`}
-                    class="tab tab-bordered"
+                    class="tab-bordered tab"
                     class:tab-active={$page.url.pathname.endsWith(`${account}`)}
                     >Transactions</a
                 >
                 <a
                     href={`/account/${account}/tokens`}
-                    class="tab tab-bordered"
+                    class="tab-bordered tab"
                     class:tab-active={$page.url.pathname.endsWith("/tokens")}
                     >Tokens</a
                 >
@@ -44,10 +44,10 @@
                     class:tab-active={$page.url.pathname.endsWith("/nfts")}
                     >nfts</a
                 > -->
-                <a
-                    href={`/account/${account}/post`}
+                <!-- <a
+                    href={`/account/${account}/comment`}
                     class="tab tab-bordered"
-                    class:tab-active={$page.url.pathname.endsWith("/post")}
+                    class:tab-active={$page.url.pathname.endsWith("/comment")}
                     >comment</a
                 >
                 <a
@@ -55,20 +55,20 @@
                     class="tab tab-bordered"
                     class:tab-active={$page.url.pathname.endsWith("/entries")}
                     >wall</a
-                >
+                > -->
                 {#if $accountInfo?.data?.value?.owner === ACCOUNT_COMPRESSION_ID.toBase58()}
                     <a
                         href={`/account/${account}/concurrent-merkle-tree`}
-                        class="tab tab-bordered"
+                        class="tab-bordered tab"
                         class:tab-active={$page.url.pathname.endsWith(
                             "concurrent-merkle-tree"
-                        )}>Concurrent Merkle Tree</a
+                        )}>concurrent merkle tree</a
                     >
                 {/if}
             </div>
             {#if !$page.url.pathname.endsWith("/tokens")}
                 <button
-                    class="btn btn-ghost btn-sm lowercase"
+                    class="btn-ghost btn-sm btn lowercase"
                     on:click={() => showModal("TRANSACTION_FILTER")}
                 >
                     <Icon id="settings" />
