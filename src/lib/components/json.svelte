@@ -38,24 +38,24 @@
             <div>
                 <h4 class="text-lg font-semibold md:text-sm">
                     {#if label === "proton"}
-                        Simple
+                        simple
                     {:else if label === "enriched"}
-                        Medium
+                        medium
                     {:else if label === "raw"}
-                        Advanced
+                        advanced
                     {:else if label === "token"}
-                        JSON Metadata
+                        json metadata
                     {/if}
                 </h4>
                 <h3 class="mr-2 text-xs opacity-50">
                     {#if label === "proton"}
-                        Parsed transaction data from XRAY's Proton
+                        parsed transaction data from xray's proton
                     {:else if label === "enriched"}
-                        Enriched transaction data from the Helius API
+                        enriched transaction data from the helius api
                     {:else if label === "raw"}
-                        Raw transaction data from the Solana RPC
+                        raw transaction data from the solana rpc
                     {:else if label === "token"}
-                        View the metadata for this NFT
+                        view the metadata for this nft
                     {/if}
                 </h3>
             </div>
