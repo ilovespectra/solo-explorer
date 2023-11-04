@@ -7,7 +7,7 @@ import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfil
 
 import pkg from "./package.json";
 
-const heliusKey = import.meta.env.VITE_HELIUS_API_KEY;
+const heliusKey = process.env.HELIUS_API_KEY;
 
 export default defineConfig(({ mode }) => ({
     build: {
