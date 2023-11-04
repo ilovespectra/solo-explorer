@@ -1,17 +1,11 @@
 <script lang="ts">
     import type { ProtonTransaction } from "$lib/xray";
-
     import { onMount } from "svelte";
-
     import { page } from "$app/stores";
-
     import { fly } from "svelte/transition";
-
     import { trpcWithQuery } from "$lib/trpc/client";
-
     import Account from "$lib/components/account-data.svelte";
     import shortenAddress from "$lib/util/shorten-string";
-
     import CopyButton from "$lib/components/copy-button.svelte";
     import IconCard from "$lib/components/icon-card.svelte";
     import Icon from "$lib/components/icon.svelte";
@@ -19,6 +13,33 @@
     import LogMessages from "$lib/components/log-messages.svelte";
     import Transaction from "$lib/components/transaction.svelte";
     import Collapse from "$lib/components/collapse.svelte";
+    import { writable } from 'svelte/store';
+    import { initializeApp } from 'firebase/app';
+    import {
+        getFirestore,
+        collection,
+        doc,
+        setDoc,
+        serverTimestamp,
+        query,
+        where,
+        getDocs,
+    } from 'firebase/firestore';
+
+    const comments = writable<{ comment: string }[]>([]);
+
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+        appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+        measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+        messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    };
+    const app = initializeApp(firebaseConfig);
 
     let animate = false;
 
@@ -51,10 +72,68 @@
     $: rawData = $rawTransaction?.data;
 
     $: ({ raw, ...rest } = data || { raw: null });
+
+    // Wallet and comment-related variables
+    // const { publicKey } = useWallet();
+    const comment = writable('');
+    let displayedComments: { comment: string }[] = [];
+
+    const fetchComments = async () => {
+        const db = getFirestore(app);
+        const commentsRef = collection(db, 'txcomment');
+        const commentsQuery = query(commentsRef, where('tx', '==', signature));
+        
+        try {
+            const querySnapshot = await getDocs(commentsQuery);
+
+            const newComments: { comment: string }[] = querySnapshot.docs
+                .map((doc) => doc.data() as { comment: string })
+                .filter((comment) => {
+                    const isDisplayed = displayedComments.some(
+                        (displayedComment) => displayedComment.comment === comment.comment
+                    );
+                    return !isDisplayed;
+                });
+
+            // Add the new comments to the displayed comments list
+            displayedComments = displayedComments.concat(newComments);
+
+            // Update the comments store
+            comments.update((currentComments) => [...currentComments, ...newComments]);
+        } catch (error) {
+            // Handle any errors if necessary
+        }
+    };
+
+onMount(() => {
+        fetchComments(); // Fetch comments when the component is mounted
+});
+
+const submitComment = async () => {
+        const commentText = $comment;
+        if (commentText) {
+            const db = getFirestore(app);
+            const commentsRef = collection(db, 'txcomment');
+            const docRef = doc(commentsRef); // Create a new document reference
+
+            try {
+                await setDoc(docRef, {
+                    comment: commentText,
+                    timestamp: serverTimestamp(),
+                    tx: signature,
+                });
+                comment.set('');
+                fetchComments(); // Fetch comments to update the list
+            } catch (error) {
+                // Handle the error if necessary
+            }
+        }
+};
+
 </script>
 
 <div class="content mb-4 mt-4 flex justify-between px-3">
-    <h1 class="text-xl font-bold">Transaction</h1>
+    <h1 class="text-xl font-bold lowercase">Transaction</h1>
     <div
         class="flex"
         on:click|preventDefault
@@ -82,6 +161,23 @@
         }}
         class="content pl-2 md:pl-0"
     >
+    <h2>add comment</h2>
+        <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
+        <textarea
+            class="text-input"
+            placeholder="write your comment here"
+            bind:value={$comment} 
+        ></textarea><br>
+        <button class="btn lowercase mb-10" on:click={submitComment}>Submit Comment</button>
+        {#if $comments.length > 0}
+    <!-- ... -->
+    {#each $comments as comment (comment.timestamp)}
+        <div class="mb-3">
+            <p>{comment.comment}</p>
+        </div>
+    {/each}
+{/if}
+
         {#if $transaction.isLoading}
             {#each Array(3) as _}
                 <div class="py-2">
@@ -96,7 +192,7 @@
             {#if data.accounts}
                 <div class="px-3 pt-3">
                     <Collapse
-                        sectionTitle="Account Changes"
+                        sectionTitle="account changes"
                         showDetails={Boolean(
                             $transaction?.data?.type === "UNKNOWN"
                         )}
@@ -129,7 +225,7 @@
                             class="col-span-10 flex items-center justify-between md:col-span-11"
                         >
                             <div>
-                                <h4 class="text-lg font-semibold md:text-sm">
+                                <h4 class="text-lg font-semibold md:text-sm lowercase">
                                     Status
                                 </h4>
                                 <h3 class="mr-2 text-xs opacity-50">
@@ -154,14 +250,14 @@
                             class="col-span-10 flex items-center justify-between md:col-span-11"
                         >
                             <div>
-                                <h4 class="text-lg font-semibold md:text-sm">
+                                <h4 class="text-lg font-semibold md:text-sm lowercase">
                                     Status
                                 </h4>
-                                <h3 class="mr-2 text-xs opacity-50">
+                                <h3 class="mr-2 text-xs opacity-50 lowercase">
                                     This transaction has successfully processed.
                                 </h3>
                             </div>
-                            <div class="badge-success badge mr-1">Success</div>
+                            <div class="badge-success badge mr-1 lowercase">Success</div>
                         </div>
                     {/if}
                 </div>
@@ -184,14 +280,14 @@
                         class="col-span-10 flex items-center justify-between pr-1 md:col-span-11"
                     >
                         <div>
-                            <h4 class="text-lg font-semibold md:text-sm">
+                            <h4 class="text-lg font-semibold md:text-sm lowercase">
                                 Network Fee
                             </h4>
-                            <h3 class="mr-2 text-xs opacity-50">
+                            <h3 class="mr-2 text-xs opacity-50 lowercase">
                                 Cost for processing this transaction.
                             </h3>
                         </div>
-                        <p class="text-xs md:text-sm">{data.fee} SOL</p>
+                        <p class="text-xs md:text-sm lowercase">{data.fee} sol</p>
                     </div>
                 </div>
             </div>
@@ -214,10 +310,10 @@
                         class="col-span-10 flex items-center justify-between pr-1 md:col-span-11"
                     >
                         <div>
-                            <h4 class="text-lg font-semibold md:text-sm">
+                            <h4 class="text-lg font-semibold md:text-sm lowercase">
                                 Slot
                             </h4>
-                            <h3 class="mr-2 text-xs opacity-50">
+                            <h3 class="mr-2 text-xs opacity-50 lowercase">
                                 The slot this transaction happened on.
                             </h3>
                         </div>
@@ -253,7 +349,7 @@
                             class="col-span-10 flex items-center justify-between pr-1 md:col-span-11"
                         >
                             <div class="py-1">
-                                <h4 class="text-lg font-semibold md:text-sm">
+                                <h4 class="text-lg font-semibold md:text-sm lowercase">
                                     Helius Description
                                 </h4>
                                 <p class="break-all text-xs opacity-50">
@@ -267,7 +363,7 @@
 
             <div class="px-3">
                 <Collapse
-                    sectionTitle="Transaction Data"
+                    sectionTitle="transaction data"
                     showDetails={true}
                     hideIcon={true}
                 >
@@ -297,6 +393,8 @@
                     </div>
                 </Collapse>
             </div>
+
+            
 
             {#if rawData}
                 <div class="px-3 pt-3">
