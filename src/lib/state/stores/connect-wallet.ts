@@ -6,18 +6,18 @@ import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
 
 import {
     PhantomWalletAdapter,
-    BackpackWalletAdapter,
-    GlowWalletAdapter,
+    // BackpackWalletAdapter,
+    // GlowWalletAdapter,
     SolflareWalletAdapter,
-    BraveWalletAdapter,
+    // BraveWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 
 export const wallets = [
     new PhantomWalletAdapter(),
-    new BackpackWalletAdapter(),
+    // new BackpackWalletAdapter(),
     new SolflareWalletAdapter(),
-    new GlowWalletAdapter(),
-    new BraveWalletAdapter(),
+    // new GlowWalletAdapter(),
+    // new BraveWalletAdapter(),
 ];
 
 export const isConnectingWallet = writable(false);
