@@ -2,9 +2,13 @@ import { Helius } from "helius-sdk";
 import { t } from "$lib/trpc/t";
 
 export const tps = t.procedure.query(async () => {
-    const helius = new Helius("16710b5a-e940-4f85-811d-250e26a2c258");
+    const heliusApiKey = process.env.HELIUS_API_KEY;
 
-    const tps = await helius.rpc.getCurrentTPS();
-
-    return tps;
+    if (heliusApiKey) {
+        const helius = new Helius(heliusApiKey);
+        const tps = await helius.rpc.getCurrentTPS();
+        return tps;
+    } else {
+        throw new Error("HELIUS_API_KEY environment variable is not defined.");
+    }
 });
