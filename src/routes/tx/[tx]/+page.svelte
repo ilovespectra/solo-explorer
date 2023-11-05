@@ -33,11 +33,11 @@
     const firebaseConfig = {
         apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
         appId: import.meta.env.VITE_FIREBASE_APP_ID,
-        authDomain:  import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-        measurementId:  import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-        messagingSenderId:  import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-        projectId:  import.meta.env.VITE_FIREBASE_PROJECT_ID,
-        storageBucket:  import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+        measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
     };
     const app = initializeApp(firebaseConfig);
 
@@ -161,23 +161,28 @@ const submitComment = async () => {
         }}
         class="content pl-2 md:pl-0"
     >
+    <div
+                    class="mt-3 mb-5grid items-center gap-3 rounded-lg border p-1 py-3"
+                >
     <h2>add comment</h2>
         <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
         <textarea
             class="text-input"
             placeholder="write your comment here"
             bind:value={$comment} 
+            style="background-color: #696969"
         ></textarea><br>
         <button class="btn lowercase mb-10" on:click={submitComment}>Submit Comment</button>
         {#if $comments.length > 0}
     <!-- ... -->
+    
     {#each $comments as comment (comment.timestamp)}
         <div class="mb-3">
             <p>{comment.comment}</p>
         </div>
     {/each}
 {/if}
-
+</div>
         {#if $transaction.isLoading}
             {#each Array(3) as _}
                 <div class="py-2">
