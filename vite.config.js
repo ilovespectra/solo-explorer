@@ -11,9 +11,6 @@ const heliusKey = process.env.HELIUS_API_KEY;
 
 export default defineConfig(({ mode }) => ({
     build: {
-        rollupOptions: {
-            external: [`'firebase/app'`],
-        },
         target: "es2020",
     },
 
