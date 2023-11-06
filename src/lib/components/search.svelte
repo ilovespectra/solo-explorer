@@ -243,20 +243,17 @@
     <div
         class="relative z-10 grid grid-flow-dense grid-cols-1 py-2 md:grid-cols-4"
     >
-    <button
-            class="bg-faint btn btn-outline col-span-1 mb-4 md:ml-2"
+        <button
+            class="bg-faint btn-outline btn col-span-1 mb-4 md:ml-2"
             on:click|preventDefault={newSearch}
         >
-            <span class="text-sm lowercase">Go</span>
+            <span class="text-sm lowercase">go</span>
         </button>
-
         <button
-            class="bg-faint btn btn-outline col-span- mb-4 md:order-first"
+            class="bg-faint btn-outline btn col-span-3 mb-4 md:order-first"
             on:click|preventDefault={connectWallet}
         >
-            <span class="text-sm lowercase"
-                >{isBackpack ? "🎒" : ""}Connect Wallet</span
-            >
+            <span class="text-sm lowercase">{isBackpack ? "🎒" : ""}connect wallet</span>
         </button>
     </div>
 {/if}
