@@ -8,7 +8,7 @@
 
 {#if $modalsStore}
     <div
-        class="bg-faint modal modal-open cursor-pointer"
+        class="bg-faint modal modal-open cursor-pointer lowercase"
         in:fade={{ duration: 250 }}
         on:click|self={hideModal}
         on:keydown|self={hideModal}
