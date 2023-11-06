@@ -116,19 +116,20 @@
         searchError = "";
         isSearching = true;
 
-        try {
-            const response = await fetch(`/api/search/${inputValue}`);
+        if (inputValue) {
+            try {
+                const response = await fetch(`/api/search/${inputValue}`);
+                const data = await response.json();
 
-            const data = await response.json();
+                if (!data.valid) {
+                    searchFailed();
+                    return;
+                }
 
-            if (!data.valid) {
+                selectSearch(data);
+            } catch (error) {
                 searchFailed();
-                return;
             }
-
-            selectSearch(data);
-        } catch (error) {
-            searchFailed();
         }
     };
 
@@ -181,12 +182,12 @@
                 class="dropdown-content relative my-3 w-full rounded-lg border bg-base-100 p-2 px-4 shadow"
             >
                 <div class="flex flex-wrap items-center justify-between">
-                    <p class="text-md mb-1 mt-2">Recents</p>
+                    <p class="text-md mb-1 mt-2">recents</p>
                     <button
                         class="btn btn-xs border-none bg-transparent"
                         on:click={clearRecents}
                     >
-                        <span class="my-1">Clear all</span>
+                        <span class="my-1 lowercase">clear all</span>
                     </button>
                 </div>
                 {#if recent.length}
@@ -242,14 +243,15 @@
     <div
         class="relative z-10 grid grid-flow-dense grid-cols-1 py-2 md:grid-cols-4"
     >
-        <button
+    <button
             class="bg-faint btn btn-outline col-span-1 mb-4 md:ml-2"
             on:click|preventDefault={newSearch}
         >
             <span class="text-sm lowercase">Go</span>
         </button>
+
         <button
-            class="bg-faint btn btn-outline col-span-3 mb-4 md:order-first"
+            class="bg-faint btn btn-outline col-span- mb-4 md:order-first"
             on:click|preventDefault={connectWallet}
         >
             <span class="text-sm lowercase"
