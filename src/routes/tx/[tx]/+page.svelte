@@ -164,7 +164,7 @@ const submitComment = async () => {
     <div
                     class="mt-3 mb-5grid items-center gap-3 rounded-lg border p-1 py-3"
                 >
-    <h2>add comment</h2>
+    <h2><b>add comment</b></h2>
         <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
         <textarea
             class="text-input"
