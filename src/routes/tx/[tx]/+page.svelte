@@ -164,22 +164,22 @@ const submitComment = async () => {
     <div
                     class="mt-3 mb-5grid items-center gap-3 rounded-lg border p-1 py-3"
                 >
-    <h2><b>add comment</b></h2>
+    <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
         <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
         <textarea
-            class="text-input"
+            class="text-input mt-5 ml-10"
             placeholder="write your comment here"
             bind:value={$comment} 
             style="background-color: #696969"
         ></textarea><br>
-        <button class="btn lowercase mb-10" on:click={submitComment}>Submit Comment</button>
-        {#if $comments.length > 0}
+        <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
+        {#if $comments.length > 0}<div><p></p></div>
     <!-- ... -->
     
     {#each $comments as comment (comment.timestamp)}
-        <div class="mb-3">
-            <p>{comment.comment}</p>
-        </div>
+    <div class="mb-3 ml-10 px-3 badge mr-1">
+        <p style="font-size: 16px;">{comment.comment}</p>
+    </div>    
     {/each}
 {/if}
 </div>
