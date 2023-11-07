@@ -146,12 +146,12 @@ const submitComment = async () => {
                     class:tab-active={$page.url.pathname.endsWith("/tokens")}
                     >tokens</a
                 >
-                <a
+                <!-- <a
                     href={`/account/${account}/nfts`}
                     class="tab tab-bordered"
                     class:tab-active={$page.url.pathname.endsWith("/nfts")}
                     >nfts</a
-                >
+                > -->
                 <!-- <a
                     href={`/account/${account}/journal`}
                     class="tab tab-bordered"
