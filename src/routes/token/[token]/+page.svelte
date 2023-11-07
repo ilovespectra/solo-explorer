@@ -21,7 +21,7 @@
     import shortenString from "$lib/util/shorten-string";
     import { cubicOut } from "svelte/easing";
     import { fade, fly } from "svelte/transition";
-
+    import { onMount } from "svelte";
     import Collapse from "$lib/components/collapse.svelte";
     import JSON from "$lib/components/json.svelte";
     import Transactions from "$lib/components/transactions.svelte";
@@ -32,6 +32,94 @@
     import TokenProvider from "$lib/components/providers/token-provider.svelte";
 
     const address = $page.params.token;
+
+    import { writable } from 'svelte/store';
+    import { initializeApp } from 'firebase/app';
+    import {
+        getFirestore,
+        collection,
+        doc,
+        setDoc,
+        serverTimestamp,
+        query,
+        where,
+        getDocs,
+    } from 'firebase/firestore';
+
+    const comments = writable<{ comment: string }[]>([]);
+
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+        appId: import.meta.env.VITE_FIREBASE_APP_ID,
+        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+        measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+    };
+    const app = initializeApp(firebaseConfig);
+
+    const signature = $page.params.token;
+
+    // Wallet and comment-related variables
+    // const { publicKey } = useWallet();
+    const comment = writable('');
+    let displayedComments: { comment: string }[] = [];
+
+    const fetchComments = async () => {
+        const db = getFirestore(app);
+        const commentsRef = collection(db, 'tokencomment');
+        const commentsQuery = query(commentsRef, where('token', '==', signature));
+        
+        try {
+            const querySnapshot = await getDocs(commentsQuery);
+
+            const newComments: { comment: string }[] = querySnapshot.docs
+                .map((doc) => doc.data() as { comment: string })
+                .filter((comment) => {
+                    const isDisplayed = displayedComments.some(
+                        (displayedComment) => displayedComment.comment === comment.comment
+                    );
+                    return !isDisplayed;
+                });
+
+            // Add the new comments to the displayed comments list
+            displayedComments = displayedComments.concat(newComments);
+
+            // Update the comments store
+            comments.update((currentComments) => [...currentComments, ...newComments]);
+        } catch (error) {
+            // Handle any errors if necessary
+        }
+    };
+
+onMount(() => {
+        fetchComments(); 
+});
+
+const submitComment = async () => {
+        const commentText = $comment;
+        if (commentText) {
+            const db = getFirestore(app);
+            const commentsRef = collection(db, 'tokencomment');
+            const docRef = doc(commentsRef); 
+
+            try {
+                await setDoc(docRef, {
+                    comment: commentText,
+                    timestamp: serverTimestamp(),
+                    token: signature,
+                });
+                comment.set('');
+                fetchComments(); // Fetch comments to update the list
+            } catch (error) {
+                // Handle the error if necessary
+            }
+        }
+};
+
 </script>
 
 <TokenProvider
@@ -39,6 +127,7 @@
     let:metadata
     let:tokenIsLoading
 >
+
     {#if tokenIsLoading}
         <div class="content">
             <PageLoader />
@@ -67,7 +156,7 @@
                 </div>
             </div>
         </div>
-
+        
         <div class="content px-3 lowercase">
             <div
                 class="flex flex-col items-center justify-center"
@@ -80,7 +169,28 @@
                     in:fade={{ delay: 600, duration: 1000 }}
                 />
             </div>
-
+            <div
+                    class="mt-3 mb-5grid items-center gap-3 rounded-lg border p-1 py-3"
+                >
+                <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
+                    <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
+                    <textarea
+                        class="text-input mt-5 ml-10"
+                        placeholder="write your comment here"
+                        bind:value={$comment} 
+                        style="background-color: #696969"
+                    ></textarea><br>
+                    <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
+                    {#if $comments.length > 0}<div><p></p></div>
+                <!-- ... -->
+                
+                {#each $comments as comment (comment.timestamp)}
+                <div class="mb-3 ml-10 px-3 badge mr-1">
+                    <p style="font-size: 16px;">{comment.comment}</p>
+                </div>    
+                {/each}
+            {/if}
+            </div>
             {#if metadata.description}
                 <div class="mt-3">
                     <div
