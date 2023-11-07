@@ -177,7 +177,7 @@ const submitComment = async () => {
     <!-- ... -->
     
     {#each $comments as comment (comment.timestamp)}
-    <div class="mb-3 ml-10 px-3 badge mr-1">
+    <div class="mb-3 ml-5 px-3 badge mr-1">
         <p style="font-size: 16px;">{comment.comment}</p>
     </div>    
     {/each}
