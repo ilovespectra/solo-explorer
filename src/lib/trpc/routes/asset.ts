@@ -1,20 +1,26 @@
 import { t } from "$lib/trpc/t";
+
 import { z } from "zod";
 
-// Remove the API key since we're using a proxy URL
-// const { HELIUS_API_KEY } = process.env;
+const { HELIUS_API_KEY } = process.env;
 
 import { connect } from "$lib/xray";
 
 // TODO: add output validation once this merges with the token endpoint
 export const asset = t.procedure.input(z.string()).query(async ({ input }) => {
-    const url = `https://rpc-proxy.denverhnt.workers.dev/?api-key=${input}`;
+    const url = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
 
     const response = await fetch(url, {
+        body: JSON.stringify({
+            id: "asset",
+            jsonrpc: "2.0",
+            method: "getAsset",
+            params: [input],
+        }),
         headers: {
             "Content-Type": "application/json",
         },
-        method: "GET", // Change the method to GET since we're using a URL parameter
+        method: "POST",
     });
 
     const data = await response.json();
