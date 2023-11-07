@@ -11,7 +11,7 @@
     }
 
     .img {
-        max-height: 55vh;
+        max-height: 25vh;
     }
 </style>
 
@@ -31,51 +31,12 @@
     import CopyButton from "$lib/components/copy-button.svelte";
     import TokenProvider from "$lib/components/providers/token-provider.svelte";
 
-    import getMimeType from "$lib/util/get-mime-type";
-    import { metadataStore } from "$lib/util/stores/metadata";
-    import type { UITokenMetadata } from "$lib/types";
-
     const address = $page.params.token;
-
-    let metadata: UITokenMetadata;
-
-    let mediaUrl: string | null = null;
-    let mediaType: string | null = null;
-
-    const setMedia = async (metadata: UITokenMetadata) => {
-        if (metadata.image) {
-            const mimeType = await getMimeType(metadata.image);
-            if (mimeType && mimeType.startsWith("video/")) {
-                mediaUrl = metadata.image;
-                mediaType = "video";
-                return;
-            }
-
-            if (metadata.video_uri) {
-                mediaUrl = metadata.video_uri;
-                mediaType = "video";
-                return;
-            }
-
-            if (metadata.image) {
-                mediaUrl = metadata.image;
-                mediaType = "image";
-            }
-        }
-    };
-
-    metadataStore.subscribe((metadata) => {
-        if (metadata) setMedia(metadata);
-    });
-
-    $: if (metadata) {
-        metadataStore.set(metadata);
-    }
 </script>
 
 <TokenProvider
     {address}
-    bind:metadata
+    let:metadata
     let:tokenIsLoading
 >
     {#if tokenIsLoading}
@@ -83,7 +44,9 @@
             <PageLoader />
         </div>
     {:else}
-        <div class="nav content sticky top-14 z-30 bg-base-100 px-3 py-2">
+        <div
+            class="nav content sticky top-14 z-30 bg-base-100 px-3 py-2 lowercase"
+        >
             <div
                 class="relative flex flex-wrap items-center justify-between bg-base-100"
             >
@@ -105,34 +68,17 @@
             </div>
         </div>
 
-        <div class="content px-3">
+        <div class="content px-3 lowercase">
             <div
                 class="flex flex-col items-center justify-center"
                 in:fade={{ delay: 100, duration: 800 }}
             >
-                {#if mediaType === "video"}
-                    <!-- Video tag -->
-                    <video
-                        class="m-auto my-3 h-auto w-full rounded-md object-contain"
-                        controls
-                        autoplay
-                        loop
-                        muted
-                        in:fade={{ delay: 600, duration: 1000 }}
-                        src={mediaUrl}
-                    />
-                {:else if mediaType === "image"}
-                    <!-- Image tag -->
-                    <img
-                        class="img m-auto my-3 h-auto w-full rounded-md object-contain"
-                        alt="token symbol"
-                        src={mediaUrl}
-                        in:fade={{ delay: 600, duration: 1000 }}
-                    />
-                {:else}
-                    <!--Loading-->
-                    <div>Loading...</div>
-                {/if}
+                <img
+                    class="img m-auto my-3 h-auto w-full rounded-md object-contain lowercase"
+                    alt="token symbol"
+                    src={metadata.image}
+                    in:fade={{ delay: 600, duration: 1000 }}
+                />
             </div>
 
             {#if metadata.description}
@@ -267,7 +213,7 @@
                             </a>
                             <div class="card p-0">
                                 <h4
-                                    class="text-sm font-medium uppercase text-gray-500"
+                                    class="text-sm font-medium lowercase text-gray-500"
                                 >
                                     Mutable
                                 </h4>
@@ -277,7 +223,7 @@
                             </div>
                             <div class="card p-0">
                                 <h4
-                                    class="text-sm font-medium uppercase text-gray-500"
+                                    class="text-sm font-medium lowercase text-gray-500"
                                 >
                                     Frozen
                                 </h4>
