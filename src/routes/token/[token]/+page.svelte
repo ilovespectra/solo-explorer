@@ -11,7 +11,8 @@
     }
 
     .img {
-        max-height: 25vh;
+        max-height: 50vh; 
+        max-width: 100%; 
     }
 </style>
 
