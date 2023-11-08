@@ -1,11 +1,14 @@
 import { t } from "$lib/trpc/t";
+
 import { z } from "zod";
+
+const { HELIUS_API_KEY } = process.env;
 
 export const token = t.procedure
     .input(z.array(z.string()))
     .query(async ({ input }) => {
         const response = await fetch(
-            `https://rpc-proxy.denverhnt.workers.dev/v0/token-metadata/`,
+            `https://api.helius.xyz/v0/token-metadata/?api-key=${HELIUS_API_KEY}`,
             {
                 body: JSON.stringify({
                     includeOffChain: true,
