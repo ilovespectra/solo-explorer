@@ -1,66 +1,42 @@
-<script lang="ts">
-    //@ts-nocheck
-    import { trpcWithQuery } from "$lib/trpc/client";
-
-    import { page } from "$app/stores";
-    import Image from "$lib/components/image.svelte";
-
-    const { account } = $page.params;
-
-    const client = trpcWithQuery($page);
-    const params = new URLSearchParams(window.location.search);
-    const network = params.get("network");
-    const isMainnetValue = network !== "devnet";
-    const createAssetsQuery = (input: {
-        account: string;
-        cursor: number;
-        isMainnet: boolean;
-    }) =>
-        client.assets.createInfiniteQuery(input, {
-            getNextPageParam: (lastPage) => lastPage.page + 1,
-            refetchOnMount: false,
-            refetchOnWindowFocus: false,
+<!-- <script lang="ts">
+    import { ownedAssets } from "$lib/state/assets";
+    import { PREVIEW_CDN } from "$lib/constants";
+    import AssetProvider from "$lib/components/providers/asset-provider.svelte";
+    import { onMount } from "svelte";
+    import ImageProvider from "$lib/components/providers/image-provider.svelte";
+    import { error } from "@sveltejs/kit";
+    let img: HTMLImageElement;
+    onMount(() => {
+        img.addEventListener("load", () => {
+            console.log("loaded");
         });
-
-    $: assets = createAssetsQuery({
-        account,
-        cursor: 1,
-        isMainnet: isMainnetValue,
+        img.addEventListener("error", () => {
+            console.log("error image");
+        });
     });
-
-    $: lastPageHadAssets =
-        $assets.data?.pages[$assets.data.pages.length - 1].total > 0;
+    $: console.log($ownedAssets, "ownedAssets");
 </script>
 
-<div class="grid grid-cols-3 gap-3 md:grid-cols-5">
-    {#each $assets.data?.pages || [] as page}
-        {#each page.items as asset}
-            {@const image = asset.content.files.find(
-                (file) => file.mime.startsWith("image") && file.uri
-            )}
-
-            <a
-                href="/token/{asset.id}?network={isMainnetValue
-                    ? 'mainnet'
-                    : 'devnet'}"
-            >
-                <Image
-                    src={image?.uri}
-                    className="aspect-square w-full rounded-lg"
-                    alt=""
-                />
-            </a>
-        {/each}
-    {/each}
-</div>
-
-{#if $assets.hasNextPage && lastPageHadAssets}
-    <div class="flex justify-center">
-        <button
-            class="btn-outline btn"
-            class:loading={$assets.isFetching}
-            class:disabled={$assets.isFetching}
-            on:click={() => $assets.fetchNextPage()}>Load More</button
+<div class="grid grid-cols-3 gap-2">
+    {#each $ownedAssets.das as id}
+        <AssetProvider
+            {id}
+            let:asset
         >
-    </div>
-{/if}
+            <ImageProvider
+                src={asset.data.imagePreview}
+                let:loaded
+                let:error
+            >
+                {#if loaded || error}
+                    <img
+                        class="aspect-square h-full w-full rounded-xl object-cover"
+                        src={asset.data.imagePreview}
+                    />
+                {:else}
+                    <div class="h-full w-full animate-pulse bg-gray-500" />
+                {/if}
+            </ImageProvider>
+        </AssetProvider>
+    {/each}
+</div> -->
