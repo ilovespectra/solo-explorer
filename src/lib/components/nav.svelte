@@ -57,7 +57,7 @@
                 <Icon id="hamburger" size="lg" />
             </button>
         </div>
-        <button class="bg-faint btn-outline btn md:order-second" on:click={connectWallet}>
+        <button class="bg-faint btn-outline btn md:order-second mr-3" on:click={connectWallet}>
             {#if $walletStore.connected}
                 <!-- If wallet is connected, display abbreviated public key -->
                 <span class="text-sm lowercase">
