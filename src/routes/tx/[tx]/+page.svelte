@@ -25,9 +25,10 @@
         where,
         getDocs,
     } from 'firebase/firestore';
-
+    
+    import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
     const comments = writable<{ comment: string }[]>([]);
-
+    const publicKey = $walletStore.publicKey;
 
     // Firebase configuration
     const firebaseConfig = {
@@ -42,7 +43,7 @@
     const app = initializeApp(firebaseConfig);
 
     let animate = false;
-
+    
     const signature = $page.params.tx;
 
     const client = trpcWithQuery($page);
@@ -58,7 +59,17 @@
             ),
         transaction: signature || "",
     });
+    let fetchPublicKeyInterval: NodeJS.Timer;
+    let fetchCommentsInterval: number;
+    const fetchPublicKey = () => {
+        const wallet = $walletStore;
+        const publicKey = wallet.publicKey;
 
+        if (!publicKey) {
+            return;
+        }
+    
+    };
     const rawTransaction = client.rawTransaction.createQuery(signature || "");
 
     onMount(() => {
@@ -72,22 +83,34 @@
     $: rawData = $rawTransaction?.data;
 
     $: ({ raw, ...rest } = data || { raw: null });
-
+    const startPublicKeyFetchTimer = () => {
+        fetchPublicKeyInterval = setInterval(() => {
+            fetchPublicKey();
+        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
+    };
     // Wallet and comment-related variables
     // const { publicKey } = useWallet();
     const comment = writable('');
     let displayedComments: { comment: string }[] = [];
-
+    
     const fetchComments = async () => {
         const db = getFirestore(app);
         const commentsRef = collection(db, 'txcomment');
-        const commentsQuery = query(commentsRef, where('tx', '==', signature));
-        
+
+        const wallet = $walletStore;
+        const publicKey = wallet.publicKey;
+
+        if (!publicKey) {
+            return;
+        }
+
+        const commentsQuery = query(commentsRef, where('walletPublicKey', '==', publicKey.toBase58()));
+
         try {
             const querySnapshot = await getDocs(commentsQuery);
 
-            const newComments: { comment: string }[] = querySnapshot.docs
-                .map((doc) => doc.data() as { comment: string })
+            const newComments: { comment: string, walletPublicKey: string }[] = querySnapshot.docs
+                .map((doc) => doc.data() as { comment: string, walletPublicKey: string })
                 .filter((comment) => {
                     const isDisplayed = displayedComments.some(
                         (displayedComment) => displayedComment.comment === comment.comment
@@ -102,11 +125,25 @@
             comments.update((currentComments) => [...currentComments, ...newComments]);
         } catch (error) {
             // Handle any errors if necessary
+            console.error("Error fetching comments:", error);
         }
     };
+    const startCommentFetchTimer = () => {
+        setInterval(() => {
+            fetchComments();
+        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
+    };
+    onMount(() => {
+        fetchComments(); 
+        fetchPublicKey();
 
-onMount(() => {
-        fetchComments(); // Fetch comments when the component is mounted
+        startCommentFetchTimer();
+        startPublicKeyFetchTimer();
+        // Cleanup function
+        return () => {
+
+            clearInterval(fetchCommentsInterval);
+        };
 });
 
 const submitComment = async () => {
@@ -114,22 +151,33 @@ const submitComment = async () => {
         if (commentText) {
             const db = getFirestore(app);
             const commentsRef = collection(db, 'txcomment');
-            const docRef = doc(commentsRef); // Create a new document reference
+            
+            // Get the connected wallet's public key
+            const wallet = $walletStore;
+            const publicKey = wallet.publicKey;
+
+            if (!publicKey) {
+               
+                return;
+            }
+
+            const docRef = doc(commentsRef);
 
             try {
                 await setDoc(docRef, {
+                    account: signature,
                     comment: commentText,
                     timestamp: serverTimestamp(),
-                    tx: signature,
+                    walletPublicKey: publicKey.toBase58(), // Include the wallet public key
                 });
                 comment.set('');
                 fetchComments(); // Fetch comments to update the list
             } catch (error) {
                 // Handle the error if necessary
+                console.error("Error submitting comment:", error);
             }
         }
-};
-
+    };
 </script>
 
 <div class="content mb-4 mt-4 flex justify-between px-3">
@@ -162,17 +210,17 @@ const submitComment = async () => {
         class="content pl-2 md:pl-0"
     >
     <div
-                    class="mt-3 mb-5grid items-center gap-3 rounded-lg border p-1 py-3"
+                    class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3"
                 >
     <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
         <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
         <textarea
-            class="text-input mt-5 ml-10"
-            placeholder="write your comment here"
+            class="text-input mt-5 ml-10 w-[100vh]"
+            placeholder=" write your comment here"
             bind:value={$comment} 
             style="background-color: #696969"
         ></textarea><br>
-        <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
+        <button class="btn center-button-container lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
         {#if $comments.length > 0}<div><p></p></div>
     <!-- ... -->
     
