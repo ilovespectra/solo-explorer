@@ -233,12 +233,12 @@ const submitComment = async () => {
                 />
             </div>
             <div
-                    class="mt-3 mb-5grid ml-2 mb-3 items-center gap-3 rounded-lg border p-1 py-3"
+                    class="mt-3 mb-5grid mb-3 items-center gap-3 rounded-lg border p-1 py-3"
                 >
                 <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
                     <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
                     <textarea
-                        class="text-input mt-5 ml-10 w-[100vh]"
+                        class="text-input mt-5 ml-10 w-[80vh]"
                         placeholder=" write your comment here"
                         bind:value={$comment} 
                         style="background-color: #696969"
