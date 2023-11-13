@@ -1,17 +1,24 @@
 <script lang="ts">
     import { page } from "$app/stores";
-
-    import Icon from "$lib/components/icon.svelte";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import AccountHeader from "$lib/components/account-header.svelte";
     import { showModal } from "$lib/state/stores/modals";
     import { trpcWithQuery } from "$lib/trpc/client";
     import { PROGRAM_ID as ACCOUNT_COMPRESSION_ID } from "@solana/spl-account-compression";
-
+    import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
+    import Icon from "$lib/components/icon.svelte";
     const client = trpcWithQuery($page);
 
     const account = $page.params.account;
     const accountInfo = client.accountInfo.createQuery(account);
+    // Access publicKey from walletStore
+    const publicKey = $walletStore.publicKey;
+
+    // Pass publicKey as a prop to AccountHeader component
+    const props = { account, link: $page.url.href, publicKey };
+    const params = new URLSearchParams(window.location.search);
+    const network = params.get("network");
+    const isMainnetValue = network === "mainnet";
 
     import { writable } from 'svelte/store';
     import { initializeApp } from 'firebase/app';
@@ -28,7 +35,6 @@
 
     const comments = writable<{ comment: string }[]>([]);
 
-
     // Firebase configuration
     const firebaseConfig = {
         apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -40,79 +46,134 @@
         storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
     };
     const app = initializeApp(firebaseConfig);
-
+    let fetchCommentsInterval: number;
     const signature = $page.params.account;
+    let fetchPublicKeyInterval: NodeJS.Timer;
 
+    const fetchPublicKey = () => {
+        const wallet = $walletStore;
+        const publicKey = wallet.publicKey;
+
+        if (!publicKey) {
+            return;
+        }
+    
+    };
+    
     // Wallet and comment-related variables
-    // const { publicKey } = useWallet();
     const comment = writable('');
     let displayedComments: { comment: string }[] = [];
 
     const fetchComments = async () => {
         const db = getFirestore(app);
         const commentsRef = collection(db, 'actcomment');
-        const commentsQuery = query(commentsRef, where('account', '==', signature));
-        
+
+        const wallet = $walletStore;
+        const publicKey = wallet.publicKey;
+
+        if (!publicKey) {
+            return;
+        }
+
+        const commentsQuery = query(commentsRef, where('walletPublicKey', '==', publicKey.toBase58()));
+
         try {
             const querySnapshot = await getDocs(commentsQuery);
 
-            const newComments: { comment: string }[] = querySnapshot.docs
-                .map((doc) => doc.data() as { comment: string })
+            const newComments: { comment: string, walletPublicKey: string }[] = querySnapshot.docs
+                .map((doc) => doc.data() as { comment: string, walletPublicKey: string })
                 .filter((comment) => {
-                    const isDisplayed = displayedComments.some(
-                        (displayedComment) => displayedComment.comment === comment.comment
-                    );
-                    return !isDisplayed;
+                    
+                    return comment.walletPublicKey === publicKey.toBase58() &&
+                        !displayedComments.some(
+                            (displayedComment) => displayedComment.comment === comment.comment
+                        );
                 });
 
-            // Add the new comments to the displayed comments list
             displayedComments = displayedComments.concat(newComments);
 
             // Update the comments store
             comments.update((currentComments) => [...currentComments, ...newComments]);
         } catch (error) {
             // Handle any errors if necessary
+            console.error("Error fetching comments:", error);
         }
+};
+
+    
+    const startCommentFetchTimer = () => {
+        setInterval(() => {
+            fetchComments();
+        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
+    };
+    
+    const startPublicKeyFetchTimer = () => {
+        fetchPublicKeyInterval = setInterval(() => {
+            fetchPublicKey();
+        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
     };
 
-onMount(() => {
+    onMount(() => {
         fetchComments(); 
-});
+        fetchPublicKey();
+
+        startCommentFetchTimer();
+        startPublicKeyFetchTimer();
+        // Cleanup function
+        return () => {
+            clearInterval(fetchCommentsInterval);
+        };
+    });
+
+    onDestroy(() => {
+        clearInterval(fetchCommentsInterval);
+        clearInterval(fetchPublicKeyInterval);
+    });
 
 const submitComment = async () => {
         const commentText = $comment;
         if (commentText) {
             const db = getFirestore(app);
             const commentsRef = collection(db, 'actcomment');
-            const docRef = doc(commentsRef); 
+            
+            // Get the connected wallet's public key
+            const wallet = $walletStore;
+            const publicKey = wallet.publicKey;
+
+            if (!publicKey) {
+               
+                return;
+            }
+
+            const docRef = doc(commentsRef);
 
             try {
                 await setDoc(docRef, {
                     account: signature,
                     comment: commentText,
                     timestamp: serverTimestamp(),
+                    walletPublicKey: publicKey.toBase58(), // Include the wallet public key
                 });
                 comment.set('');
                 fetchComments(); // Fetch comments to update the list
             } catch (error) {
                 // Handle the error if necessary
+                console.error("Error submitting comment:", error);
             }
         }
-};
+    };
+    
 </script>
 
 <div class="relative mx-auto w-full max-w-2xl pb-32">
-    <AccountHeader
-        {account}
-        link={$page.url.href}
-    />
+    <AccountHeader {...props} />
     <div
-                    class="mt-3 mb-5grid items-center gap-3 rounded-lg border p-1 py-3"
+                    class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3"
                 >
     <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
         <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
         <textarea
-            class="text-input mt-5 ml-10"
+            class="text-input mt-5 ml-10 w-[80vh]"
             placeholder="write your comment here"
             bind:value={$comment} 
             style="background-color: #696969"
@@ -120,9 +181,15 @@ const submitComment = async () => {
         <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
         {#if $comments.length > 0}<div><p></p></div>
     <!-- ... -->
-    
+    {#if publicKey}
+    <div class="mb-5 ml-5 mr-5">
+        connected with<br><i>{publicKey.toBase58()}</i>
+    </div>
+{:else}
+    <div></div>
+{/if}
     {#each $comments as comment (comment.timestamp)}
-    <div class="mb-3 ml-10 px-3 badge mr-1">
+    <div class="mb-3 ml-5 px-3 badge mr-5">
         <p style="font-size: 16px;">{comment.comment}</p>
     </div>    
     {/each}
@@ -147,18 +214,20 @@ const submitComment = async () => {
                     >tokens</a
                 >
                 <!-- <a
-                    href={`/account/${account}/nfts`}
-                    class="tab tab-bordered"
-                    class:tab-active={$page.url.pathname.endsWith("/nfts")}
-                    >nfts</a
-                > -->
-                <!-- <a
-                    href={`/account/${account}/journal`}
-                    class="tab tab-bordered"
-                    class:tab-active={$page.url.pathname.endsWith("/journal")}
-                    >journal</a
+                    href={`/account/${account}/assets?network=${
+                        isMainnetValue ? "mainnet" : "devnet"
+                    }`}
+                    class="tab-bordered tab"
+                    class:tab-active={$page.url.pathname.endsWith("/assets")}
+                    >Assets</a
                 >
                 <a
+                    href={`/account/${account}/post`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith("/post")}
+                    >journal</a
+                > -->
+                <!-- <a
                     href={`/account/${account}/entries`}
                     class="tab tab-bordered"
                     class:tab-active={$page.url.pathname.endsWith("/entries")}
@@ -174,9 +243,9 @@ const submitComment = async () => {
                     >
                 {/if}
             </div>
-            {#if !$page.url.pathname.endsWith("/tokens")}
+            {#if !$page.url.pathname.endsWith("/tokens") && !$page.url.pathname.endsWith("/assets")}
                 <button
-                    class="btn btn-ghost btn-sm lowercase"
+                    class="btn-ghost btn-sm btn"
                     on:click={() => showModal("TRANSACTION_FILTER")}
                 >
                     <Icon id="settings" />
