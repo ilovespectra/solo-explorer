@@ -1,6 +1,6 @@
 // A simple global store that lets us setup the conenct wallet boilerplate in the
 // main +layout and then trigger it from anywhere in the app.
-import { writable, get } from "svelte/store";
+import { writable, get, derived } from "svelte/store";
 
 import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
 
@@ -30,5 +30,14 @@ export const connectWallet = async (event: CustomEvent) => {
     await get(walletStore).select(event.detail);
     await get(walletStore).connect();
 
+    const publicKey = get(walletStore).publicKey;
+    if (publicKey) {
+        console.log("Connected Wallet Public Key:", publicKey.toBase58());
+    }
+
     isConnectingWallet.set(false);
 };
+
+export const connectedPublicKey = derived(walletStore, ($walletStore) => {
+    return $walletStore.publicKey;
+});
