@@ -22,7 +22,7 @@
     import shortenString from "$lib/util/shorten-string";
     import { cubicOut } from "svelte/easing";
     import { fade, fly } from "svelte/transition";
-    import { onMount, onDestroy } from "svelte";
+    import { onMount, onDestroy, afterUpdate } from "svelte";
     import Collapse from "$lib/components/collapse.svelte";
     import JSON from "$lib/components/json.svelte";
     import Transactions from "$lib/components/transactions.svelte";
@@ -52,7 +52,8 @@
     let publicKey = wallet.publicKey;
     let fetchCommentsInterval: number;
     let fetchPublicKeyInterval: NodeJS.Timer;
-    
+    let isWalletConnected = $walletStore.publicKey !== null;
+    $: isWalletConnected = publicKey !== null;
     // Firebase configuration
     const firebaseConfig = {
         apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -72,6 +73,11 @@
     const comment = writable('');
     let displayedComments: { comment: string }[] = [];
 
+    afterUpdate(() => {
+        // Update isWalletConnected after each update
+        isWalletConnected = $walletStore.publicKey !== null;
+    });
+
     const fetchPublicKey = () => {
         const wallet = $walletStore;
         const publicKey = wallet.publicKey;
@@ -90,7 +96,7 @@
         const publicKey = wallet.publicKey;
 
         if (!publicKey) {
-            console.error("No connected wallet public key.");
+
             return;
         }
 
@@ -116,7 +122,7 @@
             comments.update((currentComments) => [...currentComments, ...newComments]);
         } catch (error) {
             // Handle any errors if necessary
-            console.error("Error fetching comments:", error);
+
         }
     };
 
@@ -160,7 +166,7 @@ const submitComment = async () => {
             const publicKey = wallet.publicKey;
 
             if (!publicKey) {
-                console.error("No connected wallet public key.");
+
                 return;
             }
 
@@ -177,7 +183,7 @@ const submitComment = async () => {
                 fetchComments(); // Fetch comments to update the list
             } catch (error) {
                 // Handle the error if necessary
-                console.error("Error submitting comment:", error);
+
             }
         }
     };
@@ -232,27 +238,30 @@ const submitComment = async () => {
                     in:fade={{ delay: 600, duration: 1000 }}
                 />
             </div>
-            <div
-                    class="mt-3 mb-5grid mb-3 items-center gap-3 rounded-lg border p-1 py-3"
-                >
+            <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
                 <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
-                    <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
+                
+                {#if isWalletConnected}
                     <textarea
-                        class="text-input mt-5 ml-10 w-[80vh]"
-                        placeholder=" write your comment here"
+                        class="text-input mt-5 ml-10"
+                        placeholder="type your comment here"
                         bind:value={$comment} 
                         style="background-color: #696969"
                     ></textarea><br>
-                    <button class="btn center-button-container  lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
-                    {#if $comments.length > 0}<div><p></p></div>
-                <!-- ... -->
-                
-                {#each $comments as comment (comment.timestamp)}
-                <div class="mb-3 ml-10 px-3 badge mr-1">
-                    <p style="font-size: 16px;">{comment.comment}</p>
-                </div>    
-                {/each}
-            {/if}
+                    <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
+                {:else}
+                    <p class="ml-10 text-gray-500">connect your wallet to comment.</p>
+                {/if}
+        
+                {#if $comments.length > 0}
+                    {#each $comments as comment (comment.timestamp)}
+                        <div class="mb-3 ml-5 px-3 badge mr-5">
+                            <p style="font-size: 16px;">{comment.comment}</p>
+                        </div>    
+                    {/each}
+                {:else}
+                    <div><p></p></div>
+                {/if}
             </div>
             {#if metadata.description}
                 <div class="mt-3">
