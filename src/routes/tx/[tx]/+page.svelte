@@ -222,7 +222,7 @@ const submitComment = async () => {
         {#if isWalletConnected}
             <textarea
                 class="text-input mt-5 ml-10"
-                placeholder="ype your comment here"
+                placeholder="type your comment here"
                 bind:value={$comment} 
                 style="background-color: #696969"
             ></textarea><br>
