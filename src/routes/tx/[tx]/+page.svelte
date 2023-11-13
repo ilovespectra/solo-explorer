@@ -215,7 +215,7 @@ const submitComment = async () => {
     <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
         <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
         <textarea
-            class="text-input mt-5 ml-10 w-[100vh]"
+            class="text-input mt-5 ml-10 w-[80vh]"
             placeholder=" write your comment here"
             bind:value={$comment} 
             style="background-color: #696969"
