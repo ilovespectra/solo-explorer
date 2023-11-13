@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import { onMount, onDestroy } from "svelte";
+    import { onMount, onDestroy, afterUpdate } from "svelte";
     import AccountHeader from "$lib/components/account-header.svelte";
     import { showModal } from "$lib/state/stores/modals";
     import { trpcWithQuery } from "$lib/trpc/client";
@@ -49,7 +49,8 @@
     let fetchCommentsInterval: number;
     const signature = $page.params.account;
     let fetchPublicKeyInterval: NodeJS.Timer;
-
+    let isWalletConnected = $walletStore.publicKey !== null;
+    $: isWalletConnected = publicKey !== null;
     const fetchPublicKey = () => {
         const wallet = $walletStore;
         const publicKey = wallet.publicKey;
@@ -60,6 +61,10 @@
     
     };
     
+    afterUpdate(() => {
+        // Update isWalletConnected after each update
+        isWalletConnected = $walletStore.publicKey !== null;
+    });
     // Wallet and comment-related variables
     const comment = writable('');
     let displayedComments: { comment: string }[] = [];
@@ -75,8 +80,14 @@
             return;
         }
 
-        const commentsQuery = query(commentsRef, where('walletPublicKey', '==', publicKey.toBase58()));
-
+        if (!account) {
+            return;
+        }
+        const commentsQuery = query(
+            commentsRef,
+            where('walletPublicKey', '==', publicKey.toBase58()),
+            where('account', '==', account)  
+        );
         try {
             const querySnapshot = await getDocs(commentsQuery);
 
@@ -167,33 +178,30 @@ const submitComment = async () => {
 
 <div class="relative mx-auto w-full max-w-2xl pb-32">
     <AccountHeader {...props} />
-    <div
-                    class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3"
-                >
-    <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
-        <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
-        <textarea
-            class="text-input mt-5 ml-10 w-[80vh]"
-            placeholder="write your comment here"
-            bind:value={$comment} 
-            style="background-color: #696969"
-        ></textarea><br>
-        <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
-        {#if $comments.length > 0}<div><p></p></div>
-    <!-- ... -->
-    {#if publicKey}
-    <div class="mb-5 ml-5 mr-5">
-        connected with<br><i>{publicKey.toBase58()}</i>
-    </div>
-{:else}
-    <div></div>
-{/if}
-    {#each $comments as comment (comment.timestamp)}
-    <div class="mb-3 ml-5 px-3 badge mr-5">
-        <p style="font-size: 16px;">{comment.comment}</p>
-    </div>    
-    {/each}
-{/if}
+    <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
+        <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
+        
+        {#if isWalletConnected}
+            <textarea
+                class="text-input mt-5 ml-10"
+                placeholder="type your comment here"
+                bind:value={$comment} 
+                style="background-color: #696969"
+            ></textarea><br>
+            <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
+        {:else}
+            <p class="ml-10 text-gray-500">connect your wallet to comment.</p>
+        {/if}
+
+        {#if $comments.length > 0}
+            {#each $comments as comment (comment.timestamp)}
+                <div class="mb-3 ml-5 px-3 badge mr-5">
+                    <p style="font-size: 16px;">{comment.comment}</p>
+                </div>    
+            {/each}
+        {:else}
+            <div><p></p></div>
+        {/if}
 </div>
     <div>
         <div
