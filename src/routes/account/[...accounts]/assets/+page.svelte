@@ -3,7 +3,6 @@
     import { PREVIEW_CDN } from "$lib/constants";
     import AssetProvider from "$lib/components/providers/asset-provider.svelte";
     import { onMount } from "svelte";
-    import ImageProvider from "$lib/components/providers/image-provider.svelte";
     import { error } from "@sveltejs/kit";
     let img: HTMLImageElement;
     onMount(() => {
