@@ -111,9 +111,14 @@
             return;
         }
 
-        const commentsQuery = query(commentsRef, where('walletPublicKey', '==', publicKey.toBase58()));
-
         try {
+            // Use the transaction signature as part of the query
+            const commentsQuery = query(
+                commentsRef,
+                where('walletPublicKey', '==', publicKey.toBase58()),
+                where('account', '==', signature)
+            );
+
             const querySnapshot = await getDocs(commentsQuery);
 
             const newComments: { comment: string, walletPublicKey: string }[] = querySnapshot.docs
@@ -132,9 +137,10 @@
             comments.update((currentComments) => [...currentComments, ...newComments]);
         } catch (error) {
             // Handle any errors if necessary
-
+            console.error("Error fetching comments:", error);
         }
-    };
+};
+
     const startCommentFetchTimer = () => {
         setInterval(() => {
             fetchComments();
