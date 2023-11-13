@@ -153,7 +153,7 @@
             valid: true,
         });
 
-        window.location.href = `/account/${inputValue}`;
+        // window.location.href = `/account/${inputValue}`;
 
         connected = true;
     }
@@ -244,16 +244,16 @@
         class="relative z-10 grid grid-flow-dense grid-cols-1 py-2 md:grid-cols-4"
     >
         <button
-            class="bg-faint btn-outline btn col-span-1 mb-4 md:ml-2"
+            class="bg-faint btn-outline btn col-span-4 mb-4 md:ml-2"
             on:click|preventDefault={newSearch}
         >
             <span class="text-sm lowercase">go</span>
         </button>
-        <button
+        <!-- <button
             class="bg-faint btn-outline btn col-span-3 mb-4 md:order-first"
             on:click|preventDefault={connectWallet}
         >
             <span class="text-sm lowercase">{isBackpack ? "🎒" : ""}connect wallet</span>
-        </button>
+        </button> -->
     </div>
 {/if}
