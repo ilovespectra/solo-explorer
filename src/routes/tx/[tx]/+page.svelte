@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { ProtonTransaction } from "$lib/xray";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy, afterUpdate } from "svelte";
     import { page } from "$app/stores";
     import { fly } from "svelte/transition";
     import { trpcWithQuery } from "$lib/trpc/client";
@@ -61,6 +61,8 @@
     });
     let fetchPublicKeyInterval: NodeJS.Timer;
     let fetchCommentsInterval: number;
+    let isWalletConnected = $walletStore.publicKey !== null;
+    $: isWalletConnected = publicKey !== null;
     const fetchPublicKey = () => {
         const wallet = $walletStore;
         const publicKey = wallet.publicKey;
@@ -71,6 +73,11 @@
     
     };
     const rawTransaction = client.rawTransaction.createQuery(signature || "");
+
+    afterUpdate(() => {
+        // Update isWalletConnected after each update
+        isWalletConnected = $walletStore.publicKey !== null;
+    });
 
     onMount(() => {
         animate = true;
@@ -125,7 +132,7 @@
             comments.update((currentComments) => [...currentComments, ...newComments]);
         } catch (error) {
             // Handle any errors if necessary
-            console.error("Error fetching comments:", error);
+
         }
     };
     const startCommentFetchTimer = () => {
@@ -209,27 +216,30 @@ const submitComment = async () => {
         }}
         class="content pl-2 md:pl-0"
     >
-    <div
-                    class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3"
-                >
-    <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
-        <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
-        <textarea
-            class="text-input mt-5 ml-10 w-[80vh]"
-            placeholder=" write your comment here"
-            bind:value={$comment} 
-            style="background-color: #696969"
-        ></textarea><br>
-        <button class="btn center-button-container lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
-        {#if $comments.length > 0}<div><p></p></div>
-    <!-- ... -->
-    
-    {#each $comments as comment (comment.timestamp)}
-    <div class="mb-3 ml-5 px-3 badge mr-1">
-        <p style="font-size: 16px;">{comment.comment}</p>
-    </div>    
-    {/each}
-{/if}
+    <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
+        <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
+        
+        {#if isWalletConnected}
+            <textarea
+                class="text-input mt-5 ml-10"
+                placeholder="ype your comment here"
+                bind:value={$comment} 
+                style="background-color: #696969"
+            ></textarea><br>
+            <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
+        {:else}
+            <p class="ml-10 text-gray-500">connect your wallet to comment.</p>
+        {/if}
+
+        {#if $comments.length > 0}
+            {#each $comments as comment (comment.timestamp)}
+                <div class="mb-3 ml-5 px-3 badge mr-5">
+                    <p style="font-size: 16px;">{comment.comment}</p>
+                </div>    
+            {/each}
+        {:else}
+            <div><p></p></div>
+        {/if}
 </div>
         {#if $transaction.isLoading}
             {#each Array(3) as _}
