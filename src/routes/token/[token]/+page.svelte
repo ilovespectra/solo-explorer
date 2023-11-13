@@ -22,11 +22,11 @@
     import shortenString from "$lib/util/shorten-string";
     import { cubicOut } from "svelte/easing";
     import { fade, fly } from "svelte/transition";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import Collapse from "$lib/components/collapse.svelte";
     import JSON from "$lib/components/json.svelte";
     import Transactions from "$lib/components/transactions.svelte";
-
+    import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
     import PageLoader from "./_loader.svelte";
 
     import CopyButton from "$lib/components/copy-button.svelte";
@@ -48,8 +48,11 @@
     } from 'firebase/firestore';
 
     const comments = writable<{ comment: string }[]>([]);
-
-
+    const wallet = $walletStore;
+    let publicKey = wallet.publicKey;
+    let fetchCommentsInterval: number;
+    let fetchPublicKeyInterval: NodeJS.Timer;
+    
     // Firebase configuration
     const firebaseConfig = {
         apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -69,16 +72,36 @@
     const comment = writable('');
     let displayedComments: { comment: string }[] = [];
 
+    const fetchPublicKey = () => {
+        const wallet = $walletStore;
+        const publicKey = wallet.publicKey;
+
+        if (!publicKey) {
+            return;
+        }
+    
+    };
+    
     const fetchComments = async () => {
         const db = getFirestore(app);
         const commentsRef = collection(db, 'tokencomment');
-        const commentsQuery = query(commentsRef, where('token', '==', signature));
-        
+
+        const wallet = $walletStore;
+        const publicKey = wallet.publicKey;
+
+        if (!publicKey) {
+            console.error("No connected wallet public key.");
+            return;
+        }
+
+        const commentsQuery = query(commentsRef, where('account', '==', signature));
+
         try {
             const querySnapshot = await getDocs(commentsQuery);
 
-            const newComments: { comment: string }[] = querySnapshot.docs
-                .map((doc) => doc.data() as { comment: string })
+            const newComments: { comment: string, walletPublicKey: string }[] = querySnapshot.docs
+                .map((doc) => doc.data() as { comment: string, walletPublicKey: string })
+                .filter((comment) => comment.walletPublicKey === publicKey.toBase58())
                 .filter((comment) => {
                     const isDisplayed = displayedComments.some(
                         (displayedComment) => displayedComment.comment === comment.comment
@@ -93,33 +116,72 @@
             comments.update((currentComments) => [...currentComments, ...newComments]);
         } catch (error) {
             // Handle any errors if necessary
+            console.error("Error fetching comments:", error);
         }
     };
 
-onMount(() => {
+const startCommentFetchTimer = () => {
+        setInterval(() => {
+            fetchComments();
+        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
+    };
+
+const startPublicKeyFetchTimer = () => {
+        fetchPublicKeyInterval = setInterval(() => {
+            fetchPublicKey();
+        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
+    };
+
+    onMount(() => {
         fetchComments(); 
-});
+        fetchPublicKey();
+
+        startCommentFetchTimer();
+        startPublicKeyFetchTimer();
+        // Cleanup function
+        return () => {
+            clearInterval(fetchCommentsInterval);
+        };
+    });
+
+    onDestroy(() => {
+        clearInterval(fetchCommentsInterval);
+        clearInterval(fetchPublicKeyInterval);
+    });
 
 const submitComment = async () => {
         const commentText = $comment;
         if (commentText) {
             const db = getFirestore(app);
             const commentsRef = collection(db, 'tokencomment');
-            const docRef = doc(commentsRef); 
+            
+            // Get the connected wallet's public key
+            const wallet = $walletStore;
+            const publicKey = wallet.publicKey;
+
+            if (!publicKey) {
+                console.error("No connected wallet public key.");
+                return;
+            }
+
+            const docRef = doc(commentsRef);
 
             try {
                 await setDoc(docRef, {
+                    account: signature,
                     comment: commentText,
                     timestamp: serverTimestamp(),
-                    token: signature,
+                    walletPublicKey: publicKey.toBase58(), // Include the wallet public key
                 });
                 comment.set('');
                 fetchComments(); // Fetch comments to update the list
             } catch (error) {
                 // Handle the error if necessary
+                console.error("Error submitting comment:", error);
             }
         }
-};
+    };
+
 
 </script>
 
@@ -171,17 +233,17 @@ const submitComment = async () => {
                 />
             </div>
             <div
-                    class="mt-3 mb-5grid items-center gap-3 rounded-lg border p-1 py-3"
+                    class="mt-3 mb-5grid ml-2 mb-3 items-center gap-3 rounded-lg border p-1 py-3"
                 >
                 <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
                     <!-- <p>Logged in as: {publicKey?.toBase58()}</p> -->
                     <textarea
-                        class="text-input mt-5 ml-10"
-                        placeholder="write your comment here"
+                        class="text-input mt-5 ml-10 w-[100vh]"
+                        placeholder=" write your comment here"
                         bind:value={$comment} 
                         style="background-color: #696969"
                     ></textarea><br>
-                    <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
+                    <button class="btn center-button-container  lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
                     {#if $comments.length > 0}<div><p></p></div>
                 <!-- ... -->
                 
