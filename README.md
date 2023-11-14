@@ -3,6 +3,25 @@ this is a rewrap of Helius Labs' XRAY browser. work in progress for solo: journa
 
 ![solo-explorer](https://cdn.discordapp.com/attachments/1051281685234327613/1168908355083980891/image.png?ex=655379bd&is=654104bd&hm=07586c60a52981c696389ede23c452ed441e1e5d51606685617bfe65e789062f&)
 
+## Todo
+
+- [x] add tx, act, asset, and token comments
+- [x] filter comments by connected wallet
+- [ ] add journal page and prompts
+- [ ] add sentiment filter for comments (red/green comment badges)
+- [ ] reapply public comment option (pub/priv comments)
+- [ ] git feedback
+
+## Getting Started
+
+## Run Locally
+
+- Head to [Helius](https://www.helius.dev/) and click `Start Building` to get your Helius API key. 
+
+- Add it to your `.env.template` and rename to `.env.local`
+
+- Head to [Firebase](https://firebase.google.com/) to get started on a new project to receive your Firebase keys and add them to your `.env`
+
 ## Relevant Links
 
 🔗 **Link**: https://xray.helius.xyz/
