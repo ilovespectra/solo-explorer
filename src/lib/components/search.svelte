@@ -143,7 +143,7 @@
     $: if ($walletStore.connected && !connected) {
         focusInput();
 
-        inputValue = $walletStore.publicKey?.toBase58() || "";
+        // inputValue = $walletStore.publicKey?.toBase58() || "";
 
         addRecent({
             address: inputValue,
