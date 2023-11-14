@@ -60,7 +60,7 @@
         <button class="bg-faint btn-outline btn md:order-second mr-3" on:click={connectWallet}>
             {#if $walletStore.connected}
                 <!-- If wallet is connected, display abbreviated public key -->
-                <span class="text-sm lowercase">
+                <span class="text-sm capitalize">
                     {$walletStore.publicKey?.toBase58()?.slice(0, 8) || ""}...
                 </span>
             {:else}
