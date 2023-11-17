@@ -1,3 +1,13 @@
+<style>
+
+    .comment {
+        transition: transform 0.3s ease; 
+    }
+
+    .comment:hover {
+        transform: scale(1.1); 
+    }
+</style>
 <script lang="ts">
     import type { ProtonTransaction } from "$lib/xray";
     import { onMount, onDestroy, afterUpdate } from "svelte";
@@ -252,14 +262,12 @@ onMount(() => {
         {:else}
             <p class="ml-10 text-gray-500">connect your wallet to view comments.</p>
         {/if}
-
-       {#each $comments as comment (comment.timestamp)}
-    <!-- Make each comment a clickable element -->
-    <div class="mb-3 ml-5 px-3 badge mr-5" on:click={() => initiateSearch(comment.account)}>
-        <p style="font-size: 16px; cursor: pointer;">{comment.comment}</p>
-    </div>
-{/each}
-
+        {#each $comments as comment (comment.timestamp)}
+        <!-- Make each comment a clickable element -->
+        <div class="mb-3 ml-5 px-3 badge mr-5 comment" on:click={() => initiateSearch(comment.account)}>
+            <p style="font-size: 16px; cursor: pointer;">{comment.comment}</p>
+        </div>
+    {/each}
 </div>
     </div>
 {/if}
