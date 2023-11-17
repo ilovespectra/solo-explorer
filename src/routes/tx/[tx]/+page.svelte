@@ -419,7 +419,7 @@ const submitComment = async () => {
                         >
                             <div class="py-1">
                                 <h4 class="text-lg font-semibold md:text-sm lowercase">
-                                    Helius Description
+                                    solo: description
                                 </h4>
                                 <p class="break-all text-xs opacity-50">
                                     {data?.raw?.description}
