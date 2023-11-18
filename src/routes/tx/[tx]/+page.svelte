@@ -9,6 +9,8 @@
     import CopyButton from "$lib/components/copy-button.svelte";
     import IconCard from "$lib/components/icon-card.svelte";
     import Icon from "$lib/components/icon.svelte";
+    import { PROGRAM_ID as ACCOUNT_COMPRESSION_ID } from "@solana/spl-account-compression";
+    import { showModal } from "$lib/state/stores/modals";
     import JSON from "$lib/components/json.svelte";
     import LogMessages from "$lib/components/log-messages.svelte";
     import Transaction from "$lib/components/transaction.svelte";
@@ -18,6 +20,7 @@
     import {
         getFirestore,
         collection,
+        deleteDoc,
         doc,
         setDoc,
         serverTimestamp,
@@ -73,7 +76,8 @@
     
     };
     const rawTransaction = client.rawTransaction.createQuery(signature || "");
-
+    const account = $page.params.account;
+    const accountInfo = client.accountInfo.createQuery(account);
     afterUpdate(() => {
         // Update isWalletConnected after each update
         isWalletConnected = $walletStore.publicKey !== null;
@@ -135,24 +139,57 @@
 
             // Update the comments store
             comments.update((currentComments) => [...currentComments, ...newComments]);
+
+            await fetchAndMapComments(); // Fetch and map comments on wallet connection
+
         } catch (error) {
             // Handle any errors if necessary
-            console.error("Error fetching comments:", error);
+            // console.error("Error fetching comments:", error);
         }
 };
 
-    const startCommentFetchTimer = () => {
-        setInterval(() => {
+const fetchAndMapComments = async () => {
+        const db = getFirestore(app);
+        const commentsRef = collection(db, 'txcomment');
+        
+        try {
+            const querySnapshot = await getDocs(commentsRef);
+            const fetchedComments = querySnapshot.docs.map(doc => ({
+                data: doc.data(),
+                id: doc.id
+            }));
+            
+            // Compare fetched comments with displayed comments and assign IDs
+            displayedComments = displayedComments.map(displayedComment => {
+                const matchingComment = fetchedComments.find(fetchedComment =>
+                    fetchedComment.data.comment === displayedComment.comment
+                );
+                
+                if (matchingComment) {
+                    return {
+                        ...displayedComment,
+                        id: matchingComment.id
+                    };
+                }
+                
+                return displayedComment;
+            });
+        } catch (error) {
+            // console.error("Error fetching and mapping comments:", error);
+        }
+};
+
+$: {
+        if (isWalletConnected) {
             fetchComments();
-        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
-    };
+            fetchPublicKey();
+        }
+}
+
     onMount(() => {
         fetchComments(); 
         fetchPublicKey();
 
-        startCommentFetchTimer();
-        startPublicKeyFetchTimer();
-        // Cleanup function
         return () => {
 
             clearInterval(fetchCommentsInterval);
@@ -165,7 +202,6 @@ const submitComment = async () => {
             const db = getFirestore(app);
             const commentsRef = collection(db, 'txcomment');
             
-            // Get the connected wallet's public key
             const wallet = $walletStore;
             const publicKey = wallet.publicKey;
 
@@ -181,16 +217,49 @@ const submitComment = async () => {
                     account: signature,
                     comment: commentText,
                     timestamp: serverTimestamp(),
-                    walletPublicKey: publicKey.toBase58(), // Include the wallet public key
+                    walletPublicKey: publicKey.toBase58(), 
                 });
                 comment.set('');
-                fetchComments(); // Fetch comments to update the list
+                fetchComments(); 
             } catch (error) {
                 // Handle the error if necessary
-                console.error("Error submitting comment:", error);
+                // console.error("Error submitting comment:", error);
             }
         }
     };
+
+    const removeComment = async (comment: { comment: string }, index: number) => {
+        try {
+            // console.log(`Deleting comment: ${comment.comment}`);
+            
+            const db = getFirestore(app);
+            const commentsRef = collection(db, 'txcomment');
+
+            const querySnapshot = await getDocs(commentsRef);
+            const docs = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+            const commentToDelete = docs.find((doc) => doc.comment === comment.comment);
+
+            if (commentToDelete) {
+                await deleteDoc(doc(db, 'txcomment', commentToDelete.id));
+                
+                // Update displayedComments after successful deletion
+                displayedComments = displayedComments.filter(
+                    (displayedComment) => displayedComment.comment !== comment.comment
+                );
+
+                // Update the comments store
+                comments.update((currentComments) =>
+                    currentComments.filter(
+                        (currentComment) => currentComment.comment !== comment.comment
+                    )
+                );
+            }
+        } catch (error) {
+            // console.error('Error removing comment:', error);
+        }
+};
+
 </script>
 
 <div class="content mb-4 mt-4 flex justify-between px-3">
@@ -236,16 +305,25 @@ const submitComment = async () => {
         {:else}
             <p class="ml-10 text-gray-500">connect your wallet to comment.</p>
         {/if}
-
         {#if $comments.length > 0}
-            {#each $comments as comment (comment.timestamp)}
-                <div class="mb-3 ml-5 px-3 badge mr-5">
-                    <p style="font-size: 16px;">{comment.comment}</p>
-                </div>    
-            {/each}
-        {:else}
-            <div><p></p></div>
-        {/if}
+    {#each $comments as comment, index}
+        <div class="mb-3 ml-5 px-3 badge mr-5 flex items-center">
+            <p class="text-base">{comment.comment}</p>
+            <button
+        on:click={() => removeComment(comment, index)}
+        class="ml-2 text-gray-500 hover:text-black transition-colors"
+    >
+        X
+    </button>
+        </div>    
+    {/each}
+{:else}
+    <div class="ml-5"><p> no comments available.</p></div>
+{/if}
+
+<div class="content px-3">
+    <slot />
+</div>
 </div>
         {#if $transaction.isLoading}
             {#each Array(3) as _}
@@ -468,7 +546,7 @@ const submitComment = async () => {
             {#if rawData}
                 <div class="px-3 pt-3">
                     <Collapse
-                        sectionTitle="Log Messages"
+                        sectionTitle="log messages"
                         showDetails={Boolean(
                             $transaction?.data?.type === "UNKNOWN"
                         )}

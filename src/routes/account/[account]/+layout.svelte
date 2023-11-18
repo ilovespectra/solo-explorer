@@ -25,6 +25,7 @@
     import {
         getFirestore,
         collection,
+        deleteDoc,
         doc,
         setDoc,
         serverTimestamp,
@@ -69,6 +70,37 @@
     const comment = writable('');
     let displayedComments: { comment: string }[] = [];
 
+    const fetchAndMapComments = async () => {
+        const db = getFirestore(app);
+        const commentsRef = collection(db, 'actcomment');
+        
+        try {
+            const querySnapshot = await getDocs(commentsRef);
+            const fetchedComments = querySnapshot.docs.map(doc => ({
+                data: doc.data(),
+                id: doc.id
+            }));
+            
+            // Compare fetched comments with displayed comments and assign IDs
+            displayedComments = displayedComments.map(displayedComment => {
+                const matchingComment = fetchedComments.find(fetchedComment =>
+                    fetchedComment.data.comment === displayedComment.comment
+                );
+                
+                if (matchingComment) {
+                    return {
+                        ...displayedComment,
+                        id: matchingComment.id
+                    };
+                }
+                
+                return displayedComment;
+            });
+        } catch (error) {
+            // console.error("Error fetching and mapping comments:", error);
+        }
+};
+
     const fetchComments = async () => {
         const db = getFirestore(app);
         const commentsRef = collection(db, 'actcomment');
@@ -107,29 +139,23 @@
             comments.update((currentComments) => [...currentComments, ...newComments]);
         } catch (error) {
             // Handle any errors if necessary
-            console.error("Error fetching comments:", error);
+            // console.error("Error fetching comments:", error);
         }
 };
 
-    
-    const startCommentFetchTimer = () => {
-        setInterval(() => {
+$: {
+        if (isWalletConnected) {
             fetchComments();
-        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
-    };
-    
-    const startPublicKeyFetchTimer = () => {
-        fetchPublicKeyInterval = setInterval(() => {
             fetchPublicKey();
-        }, 2000); // Fetch every 2 seconds (2000 milliseconds)
-    };
+        }
+}
 
     onMount(() => {
         fetchComments(); 
         fetchPublicKey();
 
-        startCommentFetchTimer();
-        startPublicKeyFetchTimer();
+        // startCommentFetchTimer();
+        // startPublicKeyFetchTimer();
         // Cleanup function
         return () => {
             clearInterval(fetchCommentsInterval);
@@ -146,8 +172,7 @@ const submitComment = async () => {
         if (commentText) {
             const db = getFirestore(app);
             const commentsRef = collection(db, 'actcomment');
-            
-            // Get the connected wallet's public key
+
             const wallet = $walletStore;
             const publicKey = wallet.publicKey;
 
@@ -163,16 +188,49 @@ const submitComment = async () => {
                     account: signature,
                     comment: commentText,
                     timestamp: serverTimestamp(),
-                    walletPublicKey: publicKey.toBase58(), // Include the wallet public key
+                    walletPublicKey: publicKey.toBase58(), 
                 });
                 comment.set('');
-                fetchComments(); // Fetch comments to update the list
+                fetchComments(); 
             } catch (error) {
                 // Handle the error if necessary
-                console.error("Error submitting comment:", error);
+                // console.error("Error submitting comment:", error);
             }
         }
     };
+
+    const removeComment = async (comment: { comment: string }, index: number) => {
+        try {
+            // console.log(`Deleting comment: ${comment.comment}`);
+            
+            const db = getFirestore(app);
+            const commentsRef = collection(db, 'actcomment');
+
+            const querySnapshot = await getDocs(commentsRef);
+            const docs = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+            const commentToDelete = docs.find((doc) => doc.comment === comment.comment);
+
+            if (commentToDelete) {
+                await deleteDoc(doc(db, 'actcomment', commentToDelete.id));
+                
+                // Update displayedComments after successful deletion
+                displayedComments = displayedComments.filter(
+                    (displayedComment) => displayedComment.comment !== comment.comment
+                );
+
+                // Update the comments store
+                comments.update((currentComments) =>
+                    currentComments.filter(
+                        (currentComment) => currentComment.comment !== comment.comment
+                    )
+                );
+            }
+        } catch (error) {
+            // console.error('Error removing comment:', error);
+        }
+};
+
     
 </script>
 
@@ -194,14 +252,20 @@ const submitComment = async () => {
         {/if}
 
         {#if $comments.length > 0}
-            {#each $comments as comment (comment.timestamp)}
-                <div class="mb-3 ml-5 px-3 badge mr-5">
-                    <p style="font-size: 16px;">{comment.comment}</p>
-                </div>    
-            {/each}
-        {:else}
-            <div><p></p></div>
-        {/if}
+        {#each $comments as comment, index}
+            <div class="mb-3 ml-5 px-3 badge mr-5 flex items-center">
+                <p class="text-base">{comment.comment}</p>
+                <button
+            on:click={() => removeComment(comment, index)}
+            class="ml-2 text-gray-500 hover:text-black transition-colors"
+        >
+            X
+        </button>
+            </div>    
+        {/each}
+    {:else}
+        <div class="ml-5"><p> no comments available.</p></div>
+    {/if}
 </div>
     <div>
         <div
