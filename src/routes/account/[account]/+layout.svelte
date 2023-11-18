@@ -237,7 +237,7 @@ const submitComment = async () => {
 <div class="relative mx-auto w-full max-w-2xl pb-32">
     <AccountHeader {...props} />
     <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
-        <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
+        <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add account comment</b></h2>
         
         {#if isWalletConnected}
             <textarea
@@ -248,7 +248,7 @@ const submitComment = async () => {
             ></textarea><br>
             <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
         {:else}
-            <p class="ml-10 text-gray-500">connect your wallet to comment.</p>
+            <p class="ml-10 text-gray-500">connect your wallet to comment on this account.</p>
         {/if}
 
         {#if $comments.length > 0}
@@ -264,7 +264,7 @@ const submitComment = async () => {
             </div>    
         {/each}
     {:else}
-        <div class="ml-5"><p> no comments available.</p></div>
+        <div class="ml-5 mt-5"><p> no comments available.</p></div>
     {/if}
 </div>
     <div>
@@ -294,17 +294,18 @@ const submitComment = async () => {
                     >Assets</a
                 > -->
                 <a
+                    href={`/account/${account}/journal`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith("/journal")}
+                    >journal</a
+                >
+                <a
                     href={`/account/${account}/view`}
                     class="tab tab-bordered"
                     class:tab-active={$page.url.pathname.endsWith("/view")}
-                    >view entries</a
+                    >comments</a
                 >
-                <!-- <a
-                    href={`/account/${account}/entries`}
-                    class="tab tab-bordered"
-                    class:tab-active={$page.url.pathname.endsWith("/entries")}
-                    >wall</a
-                > -->
+                
                 {#if $accountInfo?.data?.value?.owner === ACCOUNT_COMPRESSION_ID.toBase58()}
                     <a
                         href={`/account/${account}/concurrent-merkle-tree`}
