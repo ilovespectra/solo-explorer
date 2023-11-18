@@ -7,6 +7,23 @@
     .comment:hover {
         transform: scale(1.1); 
     }
+    .comment-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left; 
+        transition: transform 0.3s ease; 
+        font-size: medium;
+    }
+
+    .comment-content:hover {
+        transform: scale(1.1); 
+    }
+
+    .comment-date {
+        font-size: small;
+        align-self: flex-start;
+    }
 </style>
 <script lang="ts">
     import type { ProtonTransaction } from "$lib/xray";
@@ -77,6 +94,21 @@
 
     const client = trpcWithQuery($page);
 
+    const formatDate = (timestamp) => {
+        const date = new Date(timestamp.toDate()); // Convert Firestore timestamp to JavaScript Date object
+        const options = {
+            day: 'numeric',
+            hour: 'numeric',
+            hour12: true,
+            minute: 'numeric',
+            month: 'numeric',
+            year: '2-digit', 
+        };
+        return date.toLocaleString('en-US', options).replace(',', ' -');
+};
+
+$: sortedEntries = $comments.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+    
     const transaction = client.transaction.createQuery({
         account: $page.url.searchParams
             .get("ref")
@@ -249,7 +281,7 @@ onMount(() => {
         class="content pl-2 md:pl-0"
     >
     <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
-        <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>view comments</b></h2>
+        <h2 class="text-lg font-semibold md:text-sm ml-10 mb-5 lowercase"><b>click to view original comment</b></h2>
         
         {#if isWalletConnected}
             <!-- <textarea
@@ -264,8 +296,10 @@ onMount(() => {
         {/if}
         {#each $comments as comment (comment.timestamp)}
         <!-- Make each comment a clickable element -->
-        <div class="mb-3 ml-5 px-3 badge mr-5 comment" on:click={() => initiateSearch(comment.account)}>
-            <p style="font-size: 16px; cursor: pointer;">{comment.comment}</p>
+        <div class="mb-3 ml-5 px-3 badge mr-5 comment-content" on:click={() => initiateSearch(comment.account)} style="width: 100%;">
+            <p>
+                <i class="comment-date">{formatDate(comment.timestamp)}</i><br>{comment.comment}
+            </p>
         </div>
     {/each}
 </div>
