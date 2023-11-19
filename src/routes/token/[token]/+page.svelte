@@ -319,7 +319,7 @@ $: {
                     </div>    
                 {/each}
             {:else}
-                <div class="ml-5"><p> no comments available.</p></div>
+                <div class="ml-5 mt-5"><p> no comments available.</p></div>
             {/if}
             </div>
             {#if metadata.description}
