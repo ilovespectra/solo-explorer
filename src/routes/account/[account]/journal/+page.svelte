@@ -204,7 +204,7 @@ const removeJournalEntry = async (entryId) => {
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  width: 75vh;
+  width: 70vh;
   background-color: #393939;
 }
 
