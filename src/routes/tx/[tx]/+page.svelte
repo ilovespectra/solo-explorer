@@ -318,7 +318,7 @@ const submitComment = async () => {
         </div>    
     {/each}
 {:else}
-    <div class="ml-5"><p> no comments available.</p></div>
+    <div class="ml-5 mt-5"><p> no comments available.</p></div>
 {/if}
 
 <div class="content px-3">
