@@ -11,6 +11,7 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        max-width: 80vh;
         text-align: left; 
         transition: transform 0.3s ease; 
         font-size: medium;
