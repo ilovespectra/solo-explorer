@@ -7,7 +7,9 @@ this is a rewrap of Helius Labs' XRAY browser. work in progress for solo: journa
 
 - [x] add tx, act, asset, and token comments
 - [x] filter comments by connected wallet
-- [ ] add journal page and prompts
+- [x] add journal page 
+- [ ] add prompts
+- [ ] replace firestore with shadow drive
 - [ ] add sentiment filter for comments (red/green comment badges)
 - [ ] reapply public comment option (pub/priv comments)
 - [ ] git feedback
