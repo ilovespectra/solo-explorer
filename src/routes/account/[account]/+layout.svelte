@@ -387,14 +387,14 @@ const updateSentiment = (value) => {
                     class:tab-active={$page.url.pathname.endsWith("/tokens")}
                     >tokens</a
                 >
-                <!-- <a
+                <a
                     href={`/account/${account}/assets?network=${
                         isMainnetValue ? "mainnet" : "devnet"
                     }`}
                     class="tab-bordered tab"
                     class:tab-active={$page.url.pathname.endsWith("/assets")}
-                    >Assets</a
-                > -->
+                    >assets</a
+                >
                 <a
                     href={`/account/${account}/journal`}
                     class="tab tab-bordered"
