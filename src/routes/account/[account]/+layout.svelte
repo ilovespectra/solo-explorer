@@ -310,7 +310,7 @@ const updateSentiment = (value) => {
         {#if isWalletConnected}
     <textarea
       class="text-input mt-5 ml-10"
-      placeholder="Type your comment here"
+      placeholder="type your comment here"
       bind:value={$comment}
       style="background-color: #696969"
     ></textarea>
