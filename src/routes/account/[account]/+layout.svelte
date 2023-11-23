@@ -35,6 +35,7 @@
     } from 'firebase/firestore';
 
     const comments = writable<{ comment: string }[]>([]);
+    const sentiment = writable('');
 
     // Firebase configuration
     const firebaseConfig = {
@@ -166,9 +167,24 @@ $: {
         clearInterval(fetchCommentsInterval);
         clearInterval(fetchPublicKeyInterval);
     });
-
-const submitComment = async () => {
+    let checkboxSentiment = '';
+$: {
+        if (checkboxSentiment === '') {
+            sentiment.set('neutral');
+        } else {
+            sentiment.set(checkboxSentiment);
+        }
+}
+    
+    const submitComment = async () => {
         const commentText = $comment;
+        let selectedSentiment = checkboxSentiment;
+
+        // If no sentiment checkbox is selected, set it to 'neutral'
+        if (selectedSentiment === '') {
+            selectedSentiment = 'neutral';
+        }
+
         if (commentText) {
             const db = getFirestore(app);
             const commentsRef = collection(db, 'actcomment');
@@ -177,7 +193,6 @@ const submitComment = async () => {
             const publicKey = wallet.publicKey;
 
             if (!publicKey) {
-               
                 return;
             }
 
@@ -187,17 +202,36 @@ const submitComment = async () => {
                 await setDoc(docRef, {
                     account: signature,
                     comment: commentText,
+                    sentiment: selectedSentiment, // Include sentiment in the Firestore doc
                     timestamp: serverTimestamp(),
-                    walletPublicKey: publicKey.toBase58(), 
+                    walletPublicKey: publicKey.toBase58(),
                 });
                 comment.set('');
-                fetchComments(); 
+                // Fetch updated comments
+                fetchComments();
             } catch (error) {
                 // Handle the error if necessary
                 // console.error("Error submitting comment:", error);
             }
         }
-    };
+};
+
+const handleCheckbox = (value) => {
+        if (checkboxSentiment === value) {
+            checkboxSentiment = ''; // If the same checkbox is clicked again, unselect it
+            sentiment.set('neutral'); // Set sentiment to neutral when unselecting the checkbox
+        } else {
+            checkboxSentiment = value; // Select the clicked checkbox
+            sentiment.set(value); // Set sentiment to the clicked value
+        }
+};
+
+// Update the sentiment value when checkbox changes
+const updateSentiment = (value) => {
+        checkboxSentiment = value === checkboxSentiment ? '' : value;
+        sentiment.set(checkboxSentiment === '' ? 'neutral' : checkboxSentiment);
+};
+
 
     const removeComment = async (comment: { comment: string }, index: number) => {
         try {
@@ -233,39 +267,107 @@ const submitComment = async () => {
 
     
 </script>
+<style>
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #A0AEC0;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.3s;
+    }
 
+    input[type="checkbox"]:checked {
+        background-color: #A0AEC0;
+    }
+
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        outline: none;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"]:checked {
+        background-color: grey;
+    }
+</style>
 <div class="relative mx-auto w-full max-w-2xl pb-32">
     <AccountHeader {...props} />
     <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
         <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add account comment</b></h2>
         
         {#if isWalletConnected}
-            <textarea
-                class="text-input mt-5 ml-10"
-                placeholder="type your comment here"
-                bind:value={$comment} 
-                style="background-color: #696969"
-            ></textarea><br>
-            <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button>
-        {:else}
-            <p class="ml-10 text-gray-500">connect your wallet to comment on this account.</p>
-        {/if}
+    <textarea
+      class="text-input mt-5 ml-10"
+      placeholder="Type your comment here"
+      bind:value={$comment}
+      style="background-color: #696969"
+    ></textarea>
+    <br />
 
-        {#if $comments.length > 0}
-        {#each $comments as comment, index}
-            <div class="mb-3 ml-5 px-3 badge mr-5 flex items-center">
-                <p class="text-base">{comment.comment}</p>
-                <button
-            on:click={() => removeComment(comment, index)}
-            class="ml-2 text-gray-500 hover:text-black transition-colors"
-        >
-            X
-        </button>
-            </div>    
-        {/each}
-    {:else}
-        <div class="ml-5 mt-5"><p> no comments available.</p></div>
-    {/if}
+    <!-- Checkboxes for bullish and bearish sentiments -->
+    <div class="mt-5 ml-10 flex items-center">
+        <label class="mr-5 flex items-center">
+            <input
+                type="checkbox"
+                checked={checkboxSentiment === 'bullish'}
+                value="bullish"
+                on:change={() => handleCheckbox('bullish')}
+            />
+            <span class="text-green-500 mr-2">&#8593;</span>
+        </label>
+        <label class="flex items-center">
+            <input
+                type="checkbox"
+                checked={checkboxSentiment === 'bearish'}
+                value="bearish"
+                on:change={() => handleCheckbox('bearish')}
+            />
+            <span class="text-red-500 mr-2">&#8595;</span>
+        </label>
+      </div>
+    <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>
+      Submit Comment
+    </button>
+  {:else}
+    <p class="ml-10 text-gray-500">
+      Connect your wallet to comment on this account.
+    </p>
+  {/if}
+
+  {#if $comments.length > 0}
+  {#each $comments as comment, index}
+    <div class="mb-3 ml-5 px-3 badge mr-5 flex items-center">
+      {#if comment.sentiment === 'bullish'}
+        <span class="text-green-500 mr-2">&#8593;</span>
+      {:else if comment.sentiment === 'bearish'}
+        <span class="text-red-500 mr-2">&#8595;</span>
+      {/if}
+      <p class="text-base">{comment.comment}</p>
+      <button
+        on:click={() => removeComment(comment, index)}
+        class="ml-2 text-gray-500 hover:text-black transition-colors"
+      >
+        X
+      </button>
+    </div>
+  {/each}
+{:else}
+  <div class="ml-5 mt-5">
+    <p>no comments available.</p>
+  </div>
+{/if}
 </div>
     <div>
         <div
