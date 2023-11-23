@@ -3,7 +3,7 @@
     import { trpcWithQuery } from "$lib/trpc/client";
 
     import { page } from "$app/stores";
-    import Image from "$lib/components/modals/image.svelte";
+    import Image from "$lib/components/image.svelte";
 
     const { account } = $page.params;
 
