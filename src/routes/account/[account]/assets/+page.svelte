@@ -10,7 +10,7 @@
     const client = trpcWithQuery($page);
     const params = new URLSearchParams(window.location.search);
     const network = params.get("network");
-    const isMainnetValue = network !== "devnet";
+    const isMainnetValue = true;
     const createAssetsQuery = (input: {
         account: string;
         cursor: number;
