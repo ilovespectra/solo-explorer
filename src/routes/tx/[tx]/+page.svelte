@@ -385,11 +385,11 @@ const updateSentiment = (value) => {
           </label>
         </div>
       <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>
-        Submit Comment
+        submit comment
       </button>
     {:else}
       <p class="ml-10 text-gray-500">
-        Connect your wallet to comment on this account.
+        connect your wallet to comment on this transaction.
       </p>
     {/if}
 
