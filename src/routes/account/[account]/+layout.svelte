@@ -325,7 +325,7 @@ const updateSentiment = (value) => {
                 value="bullish"
                 on:change={() => handleCheckbox('bullish')}
             />
-            <span class="text-green-500 mr-2">&#8593;</span>
+            <span class="text-green-500 ml-2">&#8593;</span>
         </label>
         <label class="flex items-center">
             <input
@@ -334,7 +334,7 @@ const updateSentiment = (value) => {
                 value="bearish"
                 on:change={() => handleCheckbox('bearish')}
             />
-            <span class="text-red-500 mr-2">&#8595;</span>
+            <span class="text-red-500 ml-2">&#8595;</span>
         </label>
       </div>
     <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>
