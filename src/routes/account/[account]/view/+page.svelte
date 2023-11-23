@@ -25,6 +25,17 @@
         font-size: small;
         align-self: flex-start;
     }
+    .bullish {
+        background-color: rgb(101, 152, 101);
+    }
+
+    .bearish {
+        background-color: rgb(167, 93, 93);
+    }
+
+    .neutral {
+        background-color: rgb(98, 98, 98);
+    }
 </style>
 <script lang="ts">
     import type { ProtonTransaction } from "$lib/xray";
@@ -176,10 +187,10 @@ export const searchComment = async (address: string) => {
             if (data.valid && data.url) {
                 window.open(data.url, '_blank');
             } else {
-                console.error('Invalid response or no URL');
+                // console.error('Invalid response or no URL');
             }
         } catch (error) {
-            console.error('Error handling comment click:', error);
+            // console.error('Error handling comment click:', error);
         }
 };
 
@@ -191,10 +202,10 @@ const handleCommentClick = async (address) => {
             if (result.valid && result.url) {
                 window.open(result.url, '_blank');
             } else {
-                console.error('Invalid response or no URL');
+                // console.error('Invalid response or no URL');
             }
         } catch (error) {
-            console.error('Error handling comment click:', error);
+            // console.error('Error handling comment click:', error);
         }
     };
 
@@ -229,7 +240,7 @@ const fetchComments = async () => {
 
             comments.set(allComments);
         } catch (error) {
-            console.error("Error fetching comments:", error);
+            // console.error("Error fetching comments:", error);
         }
 };
 
@@ -272,37 +283,57 @@ onMount(() => {
 </div>
 
 {#if animate}
-    <div
-        in:fly={{
-            delay: 500,
-            duration: 1000,
-            opacity: 0,
-            y: 50,
-        }}
-        class="content pl-2 md:pl-0"
-    >
-    <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
-        <h2 class="text-lg font-semibold md:text-sm ml-10 mb-5 lowercase"><b>click to view original comment</b></h2>
-        
-        {#if isWalletConnected}
-            <!-- <textarea
-                class="text-input mt-5 ml-10"
-                placeholder="type your comment here"
-                bind:value={$comment} 
-                style="background-color: #696969"
-            ></textarea><br> -->
-            <!-- <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button> -->
-        {:else}
-            <p class="ml-10 text-gray-500">connect your wallet to view comments.</p>
-        {/if}
-        {#each $comments as comment (comment.timestamp)}
-        <!-- Make each comment a clickable element -->
-        <div class="mb-3 ml-5 px-3 badge mr-5 comment-content" on:click={() => initiateSearch(comment.account)} style="width: 100%;">
-            <p>
-                <i class="comment-date">{formatDate(comment.timestamp)}</i><br>{comment.comment}
-            </p>
+    {#if $comments.length > 0}
+        <div
+            in:fly={{
+                delay: 500,
+                duration: 1000,
+                opacity: 0,
+                y: 50,
+            }}
+            class="content pl-2 md:pl-0"
+        >
+            <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
+                <h2 class="text-lg font-semibold md:text-sm ml-10 mb-5 lowercase"><b>click to view original comment</b></h2>
+                
+                {#if isWalletConnected}
+                    <!-- <textarea
+                        class="text-input mt-5 ml-10"
+                        placeholder="type your comment here"
+                        bind:value={$comment} 
+                        style="background-color: #696969"
+                    ></textarea><br> -->
+                    <!-- <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>Submit Comment</button> -->
+                {:else}
+                    <p class="ml-10 text-gray-500">connect your wallet to view comments.</p>
+                {/if}
+
+                {#each $comments as comment (comment.timestamp)}
+                    <!-- Determine class based on sentiment -->
+                    {#if comment.sentiment === 'bullish'}
+                        <div class="mb-3 ml-5 px-3 badge mr-5 comment-content bullish" on:click={() => initiateSearch(comment.account)} style="width: 100%;">
+                            <p>
+                                <i class="comment-date">{formatDate(comment.timestamp)}</i><br>{comment.comment}
+                            </p>
+                        </div>
+                    {:else if comment.sentiment === 'bearish'}
+                        <div class="mb-3 ml-5 px-3 badge mr-5 comment-content bearish" on:click={() => initiateSearch(comment.account)} style="width: 100%;">
+                            <p>
+                                <i class="comment-date">{formatDate(comment.timestamp)}</i><br>{comment.comment}
+                            </p>
+                        </div>
+                    {:else}
+                        <div class="mb-3 ml-5 px-3 badge mr-5 comment-content neutral" on:click={() => initiateSearch(comment.account)} style="width: 100%;">
+                            <p>
+                                <i class="comment-date">{formatDate(comment.timestamp)}</i><br>{comment.comment}
+                            </p>
+                        </div>
+                    {/if}
+                {/each}
+            </div>
         </div>
-    {/each}
-</div>
-    </div>
+    {:else}
+        <!-- If there are no comments -->
+        <h2 class="text-lg font-semibold md:text-sm ml-10 mb-5 lowercase">No comments</h2>
+    {/if}
 {/if}
