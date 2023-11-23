@@ -354,7 +354,7 @@ $: {
                 />
             </div>
             <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
-                <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add comment</b></h2>
+                <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add token comment</b></h2>
                 
                 {#if isWalletConnected}
                 <textarea
