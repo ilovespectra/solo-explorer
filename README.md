@@ -10,7 +10,7 @@ this is a rewrap of Helius Labs' XRAY browser. work in progress for solo: journa
 - [x] add journal page 
 - [ ] add prompts
 - [ ] replace firestore with shadow drive
-- [ ] add sentiment filter for comments (red/green comment badges)
+- [x] add sentiment filter for comments (red/green comment badges)
 - [ ] reapply public comment option (pub/priv comments)
 - [ ] git feedback
 
