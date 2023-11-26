@@ -4,18 +4,18 @@
     }
 
     .username-block:nth-child(3n + 2) {
-        background-color: #dbeafe;
-        color: #2563eb;
+        background-color: #aac3e4;
+        color: #1f54c7;
     }
 
     .username-block:nth-child(3n + 1) {
-        background-color: #fef08a;
-        color: #ca8a04;
+        background-color: #ece18e;
+        color: #906508;
     }
 
     .username-block:nth-child(3n + 3) {
-        background-color: #bbf7d0;
-        color: #16a34a;
+        background-color: #93cfa8;
+        color: #31774b;
     }
 </style>
 
@@ -25,9 +25,7 @@
     import { SOL } from "$lib/xray";
     import { onMount } from "svelte";
     import { tweened } from "svelte/motion";
-
     import formatMoney from "$lib/util/format-money";
-
     import CopyButton from "$lib/components/copy-button.svelte";
     import Icon from "$lib/components/icon.svelte";
     import Username from "$lib/components/providers/username-provider.svelte";
@@ -55,7 +53,75 @@
         balance.set($accountInfo.data.balance);
     }
 
-    $: worth = $balance * $price?.data;
+    $: worth = totalTokensBalance + $balance * $price?.data;
+
+    const url = import.meta.env.VITE_HELIUS_URL;
+
+    let totalTokensBalance = 0; // Variable to hold the total tokens balance
+
+    const getAssetsWithNativeBalance = async () => {
+        try {
+            const response = await fetch(url, {
+                body: JSON.stringify({
+                    id: 'my-id',
+                    jsonrpc: '2.0',
+                    method: 'searchAssets',
+                    params: {
+                        displayOptions: {
+                            showNativeBalance: true,
+                        },
+                        ownerAddress: account,
+                        tokenType: 'fungible',
+                    },
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                method: 'POST',
+            });
+
+            const { result } = await response.json();
+            // console.log(result); // Entire assets result
+
+            if (result && result.items && Array.isArray(result.items)) {
+                const pricedAssets = result.items.filter(
+                    (asset) => asset.token_info && asset.token_info.price_info
+                );
+
+                if (pricedAssets.length > 0) {
+                    pricedAssets.forEach((asset) => {
+                        const { symbol, price_info } = asset.token_info;
+                        const { total_price } = price_info;
+                        const formattedPrice = `$${total_price.toFixed(2)}`;
+
+                        // console.log(`Symbol: ${symbol}, Total Price: ${formattedPrice}`);
+                    });
+                } else {
+                    console.log('No assets with price information found');
+                }
+
+                totalTokensBalance = calculateTotalTokens(pricedAssets); // Calculate total tokens balance
+                // console.log('Total Tokens Balance: $', totalTokensBalance.toFixed(2));
+                return totalTokensBalance;
+            } else {
+                console.log('No assets or invalid asset data');
+            }
+        } catch (error) {
+            console.error('Error fetching assets:', error);
+        }
+};
+const calculateTotalTokens = (pricedAssets) => {
+        if (pricedAssets && pricedAssets.length > 0) {
+            return pricedAssets.reduce((total, asset) => {
+                const { price_info } = asset.token_info;
+                const { total_price } = price_info;
+                return total + total_price;
+            }, 0);
+        }
+        return 0;
+};
+getAssetsWithNativeBalance();
+
 </script>
 
 <Username
@@ -81,16 +147,13 @@
                     </div>
                 </div>
                 <div class="relative text-right">
-                    <h1 class="text-md md:block">
-                        <span class="">{$balance.toFixed(6)}</span>
-                        <span class="lowercase opacity-50">SOL</span>
-                    </h1>
-
                     {#if !$price?.isLoading}
-                        <span class="ml-1 text-xs lowercase opacity-50 md:block"
-                            >{formatMoney(worth)} USD</span
-                        >
-                    {/if}
+                    <h1 class="text-md md:block">
+                        <span class="">{formatMoney(worth)}</span
+                            >
+                        <span class="opacity-50">usd</span>
+                    </h1>
+                    {/if} 
                 </div>
             </div>
             {#if usernameIsLoading}
