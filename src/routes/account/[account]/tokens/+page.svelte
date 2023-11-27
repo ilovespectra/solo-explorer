@@ -172,8 +172,14 @@ updateWalletBalance();
         </div>
     </a>
 
-{#if $token2022.data}
-    {#each $token2022.data as token}
+    {#if $token2022.data}
+    {#each $token2022.data.filter(token => token.decimals > 0 && token.mint !== SOL)
+        .sort((a, b) => {
+            const tokenAPrice = $tokenPrices.find(price => price.id === a.mint)?.totalPrice || 0;
+            const tokenBPrice = $tokenPrices.find(price => price.id === b.mint)?.totalPrice || 0;
+            return tokenBPrice - tokenAPrice;
+        }) as token}
+        
         <TokenProvider address={token.mint} let:metadata>
             <a
                 class="mb-4 grid grid-cols-12 items-center gap-3 rounded-lg border px-3 py-2 lowercase hover:border-primary"
@@ -200,7 +206,7 @@ updateWalletBalance();
                         </h4>
                         <!-- Display Token Value -->
                         <h4 class="text-xs opacity-50">
-                            {#each tokenPrices.filter(price => price.id === token.mint) as price}
+                            {#each $tokenPrices.filter(price => price.id === token.mint) as price}
                                 {formatMoney(price.totalPrice)}
                             {/each}
                         </h4>
@@ -212,38 +218,43 @@ updateWalletBalance();
 {/if}
 
 {#if sorted}
-    {#each sorted as token (token.mint)}
-        {#if token.decimals > 0 && token.mint !== SOL}
-            <TokenProvider address={token.mint} let:metadata>
-                <a class="mb-4 grid grid-cols-12 items-center gap-3 rounded-lg border px-3 py-2 lowercase hover:border-primary" href="/token/{token.mint}">
-                    <!-- Token Image -->
-                    <div class="col-span-2 p-1 lowercase md:col-span-1">
-                        <div style="background-image: url('{metadata.image}')" class="aspect-square w-full rounded-lg bg-cover lowercase"></div>
-                    </div>
+    {#each sorted.filter(token => token.decimals > 0 && token.mint !== SOL)
+        .sort((a, b) => {
+            const tokenAPrice = $tokenPrices.find(price => price.id === a.mint)?.totalPrice || 0;
+            const tokenBPrice = $tokenPrices.find(price => price.id === b.mint)?.totalPrice || 0;
+            return tokenBPrice - tokenAPrice;
+        }) as token (token.mint)}
+        
+        <TokenProvider address={token.mint} let:metadata>
+            <a class="mb-4 grid grid-cols-12 items-center gap-3 rounded-lg border px-3 py-2 lowercase hover:border-primary" href="/token/{token.mint}">
+                <!-- Token Image -->
+                <div class="col-span-2 p-1 lowercase md:col-span-1">
+                    <div style="background-image: url('{metadata.image}')" class="aspect-square w-full rounded-lg bg-cover lowercase"></div>
+                </div>
 
-                    <!-- Token Details -->
-                    <div class="col-span-10 flex items-center justify-between text-right lowercase md:col-span-11">
-                        <div>
-                            <h4 class="font-semibold lowercase md:text-sm">{metadata?.name || ""}</h4>
-                        </div>
-                        <div>
-                            <!-- Display Token Amount -->
-                            <h4 class="font-semibold lowercase md:text-sm">{(token.amount / 10 ** token.decimals).toLocaleString()}</h4>
-                            <!-- Display Token Value -->
-                            <h4 class="text-xs lowercase opacity-50">
-                                <!-- Find the corresponding price for the token -->
-                                {#each $tokenPrices as price}
-                                    {#if price.id === token.mint}
-                                        <h4>{formatMoney(price.totalPrice)}</h4>
-                                    {/if}
-                                {/each}
-                            </h4>
-                        </div>
+                <!-- Token Details -->
+                <div class="col-span-10 flex items-center justify-between text-right lowercase md:col-span-11">
+                    <div>
+                        <h4 class="font-semibold lowercase md:text-sm">{metadata?.name || ""}</h4>
                     </div>
-                </a>
-            </TokenProvider>
-        {/if}
+                    <div>
+                        <!-- Display Token Amount -->
+                        <h4 class="font-semibold lowercase md:text-sm">{(token.amount / 10 ** token.decimals).toLocaleString()}</h4>
+                        <!-- Display Token Value -->
+                        <h4 class="text-xs lowercase opacity-50">
+                            {#each $tokenPrices as price}
+                                {#if price.id === token.mint}
+                                    <h4>{formatMoney(price.totalPrice)}</h4>
+                                {/if}
+                            {/each}
+                        </h4>
+                    </div>
+                </div>
+            </a>
+        </TokenProvider>
     {/each}
+
+
     
 {#each Array(3) as _}
 <div class="mb-3 grid animate-pulse grid-cols-12 items-center gap-3 rounded-lg">
