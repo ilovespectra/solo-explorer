@@ -254,8 +254,6 @@ updateWalletBalance();
         </TokenProvider>
     {/each}
 
-
-    
 {#each Array(3) as _}
 <div class="mb-3 grid animate-pulse grid-cols-12 items-center gap-3 rounded-lg">
         <div class="col-span-2 p-1 md:col-span-1">
