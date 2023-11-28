@@ -16,6 +16,11 @@ this is a rewrap of Helius Labs' XRAY browser. work in progress for solo: journa
 - [x] filter comments by connected wallet
 - [x] add journal page 
 - [x] add assets page
+- [x] display prices on tokens tab
+- [x] display account header balance in usd
+- [ ] display prices on transactions tab
+- [ ] display prices in assets tab
+- [ ] display cumulative portfolio value
 - [ ] add prompts
 - [ ] replace firestore with shadow drive
 - [x] add sentiment filter for comments (red/green comment badges)
