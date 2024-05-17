@@ -40,7 +40,7 @@
 
 <div class="intro relative flex h-screen w-full items-center">
     <div
-        style="background-image: url(https://cdn.discordapp.com/attachments/1051281685234327613/1157422053037711470/Frame_6_1.png?ex=65188cc9&is=65173b49&hm=b1259fc7309656b3d34455995ff768ff9b4d96b902607430e34b51643e49e16e&);"
+        style="background-image: url(https://media.discordapp.net/attachments/1051281685234327613/1157422751192195122/Frame_6_3.png?ex=6647c66f&is=664674ef&hm=7439e3678b9fbc9f14c9931f254f5a56269012c042679427d7208c0a09eba129&=&format=webp&quality=lossless);"
         class="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 bg-cover bg-center"
     />
 
