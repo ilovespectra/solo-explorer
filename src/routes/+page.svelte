@@ -40,7 +40,7 @@
 
 <div class="intro relative flex h-screen w-full items-center">
     <div
-        style="background-image: url(https://media.discordapp.net/attachments/1051281685234327613/1157422751192195122/Frame_6_3.png?ex=6647c66f&is=664674ef&hm=7439e3678b9fbc9f14c9931f254f5a56269012c042679427d7208c0a09eba129&=&format=webp&quality=lossless);"
+        style="background-image: url(https://github.com/ilovespectra/solo-explorer/blob/main/src/lib/assets/helius/bg.png?raw=true);"
         class="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 bg-cover bg-center"
     />
 
