@@ -249,10 +249,6 @@
     onMount(async () => {
         await getAssetsWithNativeBalance();
         createChart();
-        fetchInterval = setInterval(async () => {
-            await getAssetsWithNativeBalance();
-            createChart();
-        }, 10 * 60 * 1000); 
 });
 
 
