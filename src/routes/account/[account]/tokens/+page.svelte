@@ -293,7 +293,7 @@
 <div>
     <canvas id="myPieChart"></canvas>
     <div class="flex justify-left mb-4">
-        <button on:click={downloadPortfolio} class="mr-2 px-4 py-2 rounded bg-gray-800 text-white">Download Portfolio</button>
+        <button on:click={downloadPortfolio} class="mr-2 px-4 py-2 rounded bg-gray-800 text-white lowercase">download portfolio</button>
         <button on:click={() => window.location.reload()} class="px-4 py-2 rounded bg-gray-800 text-white">
             <span class="material-icons">refresh</span>
         </button>
