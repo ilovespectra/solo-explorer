@@ -225,7 +225,7 @@
                 labels
             },
             options: {
-                cutout: '70%',
+                cutout: '60%',
                 plugins: {
                     legend: {
                         position: 'top'
