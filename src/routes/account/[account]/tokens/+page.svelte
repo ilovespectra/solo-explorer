@@ -178,10 +178,7 @@
     const createChart = () => {
         const ctx = document.getElementById('myPieChart').getContext('2d');
 
-        // Sort tokens by total price in descending order
         const sortedTokens = get(tokenPrices).slice().sort((a, b) => b.totalPrice - a.totalPrice);
-        
-        // Extract labels and data from sorted tokens
         const labels = sortedTokens.map(token => token.symbol);
         const data = sortedTokens.map(token => ((token.totalPrice / totalTokensBalance) * 100).toFixed(2));
 
@@ -193,42 +190,34 @@
             data: {
                 datasets: [{
                     backgroundColor: [
-                        '#7E57C2', // Light Purple
-                        '#42A5F5', // Light Blue
-                        '#66BB6A', // Light Green
-                        '#9575CD', // Light Purple
-                        '#81C784', // Light Green
-                        '#64B5F6', // Light Blue
-                        '#9CCC65', // Light Green
-                        '#90CAF9', // Light Blue
-                        '#C5E1A5', // Light Green
-                        '#FFAB91', // Light Orange
-                        '#B0BEC5', // Blue Grey
-                        '#BCAAA4', // Light Brown
-                        '#F48FB1', // Light Pink
-                        '#66BB6A', // Light Green
-                        '#FFF176', // Light Yellow
-                        '#81C784', // Light Green
-                        '#80CBC4', // Light Cyan
-                        '#90A4AE', // Blue Grey
-                        '#F48FB1', // Light Pink
-                        '#64B5F6', // Light Blue
-                        '#FFB74D', // Light Orange
-                        '#90A4AE', // Blue Grey
-                    ]
-
-
-                    ,
-
-                    data
+                        '#7E57C2', '#42A5F5', '#66BB6A', '#9575CD', '#81C784', '#64B5F6', 
+                        '#9CCC65', '#90CAF9', '#C5E1A5', '#FFAB91', '#B0BEC5', '#BCAAA4', 
+                        '#F48FB1', '#66BB6A', '#FFF176', '#81C784', '#80CBC4', '#90A4AE', 
+                        '#F48FB1', '#64B5F6', '#FFB74D', '#90A4AE'
+                    ],
+                    data,
+                    hoverOffset: 10
                 }],
                 labels
             },
             options: {
                 cutout: '60%',
+                layout: {
+                    padding: {
+                        bottom: 20,
+                        left: 20,
+                        right: 20,
+                        top: 20
+                    }
+                },
                 plugins: {
                     legend: {
-                        position: 'top'
+                        align: 'start',
+                        labels: {
+                            pointStyle: 'rect',
+                            usePointStyle: true, // Use small squares instead of rectangles
+                        },
+                        position: 'top', // Align legend items to start
                     },
                     tooltip: {
                         callbacks: {
@@ -249,8 +238,7 @@
     onMount(async () => {
         await getAssetsWithNativeBalance();
         createChart();
-});
-
+    });
 
     onDestroy(() => {
         clearInterval(fetchInterval);
@@ -280,15 +268,71 @@
         transition: opacity 0.3s;
     }
 
+    .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 90%;
+        margin: auto;
+        z-index: 1;
+        background-color: transparent;
+    }
+
     .button:hover .tooltiptext {
         visibility: visible;
         opacity: 1;
     }
+
+    .canvas {
+        margin-bottom: 2;
+        margin-top: 2;
+    }
+    
+    .transparent {
+        background-color: transparent;
+    }
+
+    .chart-legend-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+        .chart-legend-container {
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    }
+
+    .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .legend-color-box {
+        width: 16px;
+        height: 16px;
+        background-color: currentColor;
+    }
 </style>
 
 <div>
-    <canvas id="myPieChart"></canvas>
-    <div class="flex justify-left mb-4">
+    <div class="chart-legend-container">
+        <div class="chart-legend" id="chart-legend"></div>
+        <div class="chart-container transparent">
+            <canvas id="myPieChart"></canvas>
+        </div>
+    </div>
+
+    <div class="flex justify-left mb-4 transparent">
         <button on:click={downloadPortfolio} class="mr-2 px-4 py-2 rounded bg-gray-800 text-white lowercase">download portfolio</button>
         <button on:click={() => window.location.reload()} class="px-4 py-2 rounded bg-gray-800 text-white">
             <span class="material-icons">refresh</span>
