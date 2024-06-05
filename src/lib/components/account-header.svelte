@@ -133,8 +133,8 @@ getAssetsWithNativeBalance();
         <div class="flex flex-col bg-base-100">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                    <h3 class="relative m-0 text-lg font-bold md:text-2xl">
-                        <ShortenAddress address={account} />
+                    <h3 class="relative m-0 text-lg font-bold md:text-l">
+                        {account}
                     </h3>
                     <div class="relative flex items-center">
                         <div class="my-2">
