@@ -169,7 +169,7 @@ getAssetsWithNativeBalance();
                     {#each usernames as username}
                         {#if username.type === "backpack"}
                             <div
-                                class="inline-block rounded-full bg-red-200/90 px-3 py-1 text-xs font-extrabold text-red-600/90"
+                                class="inline-block rounded-full bg-red-200/90 mb-2 px-3 py-1 text-xs font-extrabold text-red-600/90"
                             >
                                 <div
                                     class="flex items-center justify-center gap-1"
@@ -187,7 +187,7 @@ getAssetsWithNativeBalance();
                             </div>
                         {:else}
                             <div
-                                class="username-block inline-block rounded-full px-3 py-1 text-xs font-extrabold"
+                                class="username-block inline-block rounded-full mb-2 px-3 py-1 text-xs font-extrabold"
                             >
                                 {username.username}
                             </div>
