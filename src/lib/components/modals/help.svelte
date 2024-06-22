@@ -10,7 +10,7 @@
     ];
 </script>
 
-        <p>make comments on accounts, transactions, and tokens, that only you can see- (works on Devnet)</p><br>
+        <p>make comments on accounts, transactions, and tokens, that only you can see (works on Devnet)</p><br>
         <p><i>not intended for sensitive data!</i></p><br>
 
 <p class="mb-3 lowercase">
