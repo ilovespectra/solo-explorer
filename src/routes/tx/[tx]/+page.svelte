@@ -44,7 +44,7 @@
         storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
     };
     const app = initializeApp(firebaseConfig);
-
+    
     let animate = false;
     
     const signature = $page.params.tx;
@@ -79,6 +79,10 @@
     const rawTransaction = client.rawTransaction.createQuery(signature || "");
     const account = $page.params.account;
     const accountInfo = client.accountInfo.createQuery(account);
+    const props = { account, link: $page.url.href, publicKey };
+    const params = new URLSearchParams(window.location.search);
+    const network = params.get("network");
+    const isMainnetValue = network === "mainnet";
     afterUpdate(() => {
         // Update isWalletConnected after each update
         isWalletConnected = $walletStore.publicKey !== null;
@@ -204,6 +208,13 @@ $: {
             sentiment.set(checkboxSentiment);
         }
 }
+
+let commenter = '';
+    $: {
+        if (isWalletConnected) {
+            commenter = $walletStore.publicKey?.toBase58() || '';
+        }
+    }
     
     const submitComment = async () => {
         const commentText = $comment;
@@ -355,6 +366,63 @@ const updateSentiment = (value) => {
         <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add tx comment</b></h2>
         
         {#if isWalletConnected}
+        <div
+            class="mx-3 mb-5 mt-3 flex items-center justify-between rounded-lg border"
+        >
+            <div class="tabs w-full pt-1 lowercase md:w-auto">
+                <div />
+                <a
+                    href={`/account/${commenter}`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith(`${commenter}`)}
+                    >transactions</a
+                >
+                <a
+                    href={`/account/${commenter}/tokens`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith("/tokens")}
+                    >tokens</a
+                >
+                <a
+                    href={`/account/${commenter}/assets?network=${
+                        isMainnetValue ? "mainnet" : "devnet"
+                    }`}
+                    class="tab-bordered tab"
+                    class:tab-active={$page.url.pathname.endsWith("/assets")}
+                    >assets</a
+                >
+                <a
+                    href={`/account/${commenter}/journal`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith("/journal")}
+                    >journal</a
+                >
+                <a
+                    href={`/account/${commenter}/view`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith("/view")}
+                    >comments</a
+                >
+                
+                {#if $accountInfo?.data?.value?.owner === ACCOUNT_COMPRESSION_ID.toBase58()}
+                    <a
+                        href={`/account/${$walletStore.publicKey}/concurrent-merkle-tree`}
+                        class="tab tab-bordered"
+                        class:tab-active={$page.url.pathname.endsWith(
+                            "concurrent-merkle-tree"
+                        )}>Concurrent Merkle Tree</a
+                    >
+                {/if}
+            </div>
+            <!-- {#if !$page.url.pathname.endsWith("/tokens") && !$page.url.pathname.endsWith("/assets")}
+                <button
+                    class="btn-ghost btn-sm btn"
+                    on:click={() => showModal("TRANSACTION_FILTER")}
+                >
+                    <Icon id="settings" />
+                </button>
+            {/if} -->
+        </div>
         <textarea
         class="text-input mt-5 ml-10"
         placeholder="type your comment here"
