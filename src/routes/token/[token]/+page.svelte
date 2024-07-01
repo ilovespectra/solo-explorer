@@ -51,10 +51,12 @@
     import basisPointsToPercentage from "$lib/util/percentage";
     import shortenString from "$lib/util/shorten-string";
     import { cubicOut } from "svelte/easing";
+    import { PROGRAM_ID as ACCOUNT_COMPRESSION_ID } from "@solana/spl-account-compression";
     import { fade, fly } from "svelte/transition";
     import { onMount, onDestroy, afterUpdate } from "svelte";
     import Collapse from "$lib/components/collapse.svelte";
     import JSON from "$lib/components/json.svelte";
+    import { trpcWithQuery } from "$lib/trpc/client";
     import Transactions from "$lib/components/transactions.svelte";
     import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
     import PageLoader from "./_loader.svelte";
@@ -63,6 +65,7 @@
     import TokenProvider from "$lib/components/providers/token-provider.svelte";
 
     const address = $page.params.token;
+    const client = trpcWithQuery($page);
 
     import { writable } from 'svelte/store';
     import { initializeApp } from 'firebase/app';
@@ -77,6 +80,9 @@
         where,
         getDocs,
     } from 'firebase/firestore';
+
+    const account = $page.params.account;
+    const accountInfo = client.accountInfo.createQuery(account);
 
     const sentiment = writable('');
     const comments = writable<{ comment: string }[]>([]);
@@ -97,8 +103,13 @@
         storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
     };
     const app = initializeApp(firebaseConfig);
-
+    
     const signature = $page.params.token;
+
+    const props = { account, link: $page.url.href, publicKey };
+    const params = new URLSearchParams(window.location.search);
+    const network = params.get("network");
+    const isMainnetValue = network === "mainnet";
 
     // Wallet and comment-related variables
     // const { publicKey } = useWallet();
@@ -304,6 +315,13 @@ $: {
         }
 }
 
+let commenter = '';
+    $: {
+        if (isWalletConnected) {
+            commenter = $walletStore.publicKey?.toBase58() || '';
+        }
+    }
+
 </script>
 
 <TokenProvider
@@ -329,6 +347,8 @@ $: {
                     </h3>
                 </div>
 
+                
+                
                 <div>
                     <div class="my-2">
                         <CopyButton text={$page.params.search} />
@@ -338,7 +358,9 @@ $: {
                         />
                     </div>
                 </div>
+                
             </div>
+            
         </div>
         
         <div class="content px-3 lowercase">
@@ -353,10 +375,68 @@ $: {
                     in:fade={{ delay: 600, duration: 1000 }}
                 />
             </div>
+            
             <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
                 <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add token comment</b></h2>
                 
                 {#if isWalletConnected}
+                <div
+            class="mx-3 mb-5 mt-3 flex items-center justify-between rounded-lg border"
+        >
+            <div class="tabs w-full pt-1 lowercase md:w-auto">
+                <div />
+                <a
+                    href={`/account/${commenter}`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith(`${commenter}`)}
+                    >transactions</a
+                >
+                <a
+                    href={`/account/${commenter}/tokens`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith("/tokens")}
+                    >tokens</a
+                >
+                <a
+                    href={`/account/${commenter}/assets?network=${
+                        isMainnetValue ? "mainnet" : "devnet"
+                    }`}
+                    class="tab-bordered tab"
+                    class:tab-active={$page.url.pathname.endsWith("/assets")}
+                    >assets</a
+                >
+                <a
+                    href={`/account/${commenter}/journal`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith("/journal")}
+                    >journal</a
+                >
+                <a
+                    href={`/account/${commenter}/view`}
+                    class="tab tab-bordered"
+                    class:tab-active={$page.url.pathname.endsWith("/view")}
+                    >comments</a
+                >
+                
+                {#if $accountInfo?.data?.value?.owner === ACCOUNT_COMPRESSION_ID.toBase58()}
+                    <a
+                        href={`/account/${$walletStore.publicKey}/concurrent-merkle-tree`}
+                        class="tab tab-bordered"
+                        class:tab-active={$page.url.pathname.endsWith(
+                            "concurrent-merkle-tree"
+                        )}>Concurrent Merkle Tree</a
+                    >
+                {/if}
+            </div>
+            <!-- {#if !$page.url.pathname.endsWith("/tokens") && !$page.url.pathname.endsWith("/assets")}
+                <button
+                    class="btn-ghost btn-sm btn"
+                    on:click={() => showModal("TRANSACTION_FILTER")}
+                >
+                    <Icon id="settings" />
+                </button>
+            {/if} -->
+        </div>
                 <textarea
                 class="text-input mt-5 ml-10"
                 placeholder="type your comment here"
@@ -416,6 +496,7 @@ $: {
             <div class="ml-5 mt-5">
               <p>no comments available.</p>
             </div>
+
           {/if}
             </div>
             {#if metadata.description}
@@ -743,4 +824,5 @@ $: {
             </div>
         </div>
     {/if}
+    
 </TokenProvider>
