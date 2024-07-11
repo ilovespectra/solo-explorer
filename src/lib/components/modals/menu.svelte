@@ -3,7 +3,7 @@
     { name: "x", url: "https://x.com/soloexplorerxyz" },
     { name: "docs", url: "https://solo-docs.vercel.app/" },
     { name: "build", url: "https://github.com/ilovespectra/solo-explorer" }, 
-    { name: "links", url: "https://linktr.ee/soloxyz" },
+    { name: "links", url: "https://linktr.ee/solo.xyz" },
     { name: "helius", url: "https://helius.xyz" }] as { name, url }}
     <a
         href={url}
