@@ -11,19 +11,19 @@ export const recentSearchesKey = "xray:searches";
 export const modals: Record<string, Modal> = {
     HELP: {
         component: Help,
-        title: "Help",
+        title: "help",
     },
     MENU: {
         component: Menu,
-        title: "XRAY",
+        title: "solo:",
     },
     SELECT_MULTI_WALLET: {
         component: WalletSelector,
-        title: "Select Wallet",
+        title: "select wallet",
     },
     TRANSACTION_FILTER: {
         component: TransactionFilter,
-        title: "Filter",
+        title: "filter",
     },
 };
 
