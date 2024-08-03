@@ -17,6 +17,36 @@
         background-color: #93cfa8;
         color: #31774b;
     }
+
+    .domain-abc {
+        background-color: #93c5fd !important;
+        color: #1d4ed8 !important;
+    }
+    
+    .domain-sol {
+        background-color: #86efac !important;
+        color: #14532d !important;
+    }
+    
+    .domain-ser {
+        background-color: #fb7185 !important;
+        color: #881337 !important;
+    }
+    
+    .domain-blink {
+        background-color: #c084fc !important;
+        color: #4c1d95 !important;
+    }
+    
+    .domain-poor {
+        background-color: #fafafa !important;
+        color: #525252 !important;
+    }
+    
+    .domain-bonk {
+        background-color: #fdba74 !important;
+        color: #7c2d12 !important;
+    }
 </style>
 
 <script lang="ts">
@@ -109,8 +139,8 @@
         } catch (error) {
             console.error('Error fetching assets:', error);
         }
-};
-const calculateTotalTokens = (pricedAssets) => {
+    };
+    const calculateTotalTokens = (pricedAssets) => {
         if (pricedAssets && pricedAssets.length > 0) {
             return pricedAssets.reduce((total, asset) => {
                 const { price_info } = asset.token_info;
@@ -119,8 +149,8 @@ const calculateTotalTokens = (pricedAssets) => {
             }, 0);
         }
         return 0;
-};
-getAssetsWithNativeBalance();
+    };
+    getAssetsWithNativeBalance();
 
 </script>
 
@@ -148,12 +178,12 @@ getAssetsWithNativeBalance();
                 </div>
                 <div class="relative text-right">
                     {#if !$price?.isLoading}
-                    <h1 class="text-md md:block">
+                        <h1 class="text-md md:block">
                         <span class="">{formatMoney(worth)}</span
                             >
-                        <span class="opacity-50">usd</span>
-                    </h1>
-                    {/if} 
+                            <span class="opacity-50">usd</span>
+                        </h1>
+                    {/if}
                 </div>
             </div>
             {#if usernameIsLoading}
@@ -187,7 +217,9 @@ getAssetsWithNativeBalance();
                             </div>
                         {:else}
                             <div
-                                class="username-block inline-block rounded-full mb-2 px-3 py-1 text-xs font-extrabold"
+                                class={`username-block mb-2 inline-block rounded-full px-3 py-1 text-xs font-extrabold ${
+                                    "domain-" + username.username.split(".")[1]
+                                }`}
                             >
                                 {username.username}
                             </div>
