@@ -3,9 +3,11 @@ import { t } from "$lib/trpc/t";
 import { z } from "zod";
 
 import { VITE_HELIUS_API_KEY } from "$env/static/private";
+import { Connection } from "@solana/web3.js";
+import { TldParser } from "@onsol/tldparser";
 
 interface Username {
-    type: "bonfida";
+    type: "bonfida" | "alldomains";
     username: string;
 }
 
@@ -24,6 +26,26 @@ const getSolanaDomain = async (usernames: Username[], address = "") => {
     }
 };
 
+const getAllDomainsDomain = async (usernames: Username[], address = "") => {
+    const connection = new Connection(process.env.HELIUS_API_URL as string);
+    const parser = new TldParser(connection);
+
+    await Promise.allSettled(
+        ["blink", "ser", "bonk", "poor", "abc"].map(async (domain) => {
+            const domains = await parser.getParsedAllUserDomainsFromTld(
+                address,
+                domain
+            );
+            for (const domain of domains) {
+                usernames.push({
+                    type: "alldomains",
+                    username: domain.domain,
+                });
+            }
+        })
+    );
+};
+
 export const accountUsernames = t.procedure
     .input(z.string())
     .output(
@@ -36,7 +58,10 @@ export const accountUsernames = t.procedure
     )
     .query(async ({ input: address }) => {
         const usernames: Username[] = [];
-        await getSolanaDomain(usernames, address);
+        await Promise.allSettled([
+            getSolanaDomain(usernames, address),
+            getAllDomainsDomain(usernames, address),
+        ]);
 
         return usernames || [];
     });

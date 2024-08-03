@@ -89,7 +89,7 @@
         "@heroicons/react": "^1.0.5",
         "@lottiefiles/svelte-lottie-player": "^0.3.0",
         "@noble/ed25519": "^1.7.1",
-        "@onsol/tldparser": "^0.5.3",
+        "@onsol/tldparser": "^0.6.5",
         "@solana/pay": "^0.2.4",
         "@solana/spl-account-compression": "^0.1.8",
         "@solana/spl-token-registry": "^0.2.7",
