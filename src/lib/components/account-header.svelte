@@ -73,7 +73,7 @@
     });
 
     let animate = false;
-    let isExpanded = false; // State to manage the dropdown
+    let isExpanded = false; 
 
     onMount(() => {
         animate = true;
@@ -87,7 +87,7 @@
 
     const url = import.meta.env.VITE_HELIUS_URL;
 
-    let totalTokensBalance = 0; // Variable to hold the total tokens balance
+    let totalTokensBalance = 0; 
 
     const getAssetsWithNativeBalance = async () => {
         try {
@@ -111,7 +111,6 @@
             });
 
             const { result } = await response.json();
-            // console.log(result); // Entire assets result
 
             if (result && result.items && Array.isArray(result.items)) {
                 const pricedAssets = result.items.filter(
@@ -124,14 +123,12 @@
                         const { total_price } = price_info;
                         const formattedPrice = `$${total_price.toFixed(2)}`;
 
-                        // console.log(`Symbol: ${symbol}, Total Price: ${formattedPrice}`);
                     });
                 } else {
                     console.log('No assets with price information found');
                 }
 
-                totalTokensBalance = calculateTotalTokens(pricedAssets); // Calculate total tokens balance
-                // console.log('Total Tokens Balance: $', totalTokensBalance.toFixed(2));
+                totalTokensBalance = calculateTotalTokens(pricedAssets); 
                 return totalTokensBalance;
             } else {
                 console.log('No assets or invalid asset data');
@@ -152,7 +149,6 @@
     };
     getAssetsWithNativeBalance();
 
-    // Sorting the usernames based on priority
     const sortUsernames = (usernames) => {
         const domainPriority = {
             'abc': 5,
@@ -160,7 +156,7 @@
             'bonk': 2,
             'default': 6,
             'poor': 4,
-            'sol': 1 // In case other domains appear
+            'sol': 1 
         };
 
         return usernames.sort((a, b) => {
