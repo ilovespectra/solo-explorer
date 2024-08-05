@@ -22,33 +22,32 @@
         background-color: #93c5fd !important;
         color: #1d4ed8 !important;
     }
-    
+
     .domain-sol {
         background-color: #86efac !important;
         color: #14532d !important;
     }
-    
+
     .domain-ser {
         background-color: #fb7185 !important;
         color: #881337 !important;
     }
-    
+
     .domain-blink {
         background-color: #c084fc !important;
         color: #4c1d95 !important;
     }
-    
+
     .domain-poor {
         background-color: #fafafa !important;
         color: #525252 !important;
     }
-    
+
     .domain-bonk {
         background-color: #fdba74 !important;
         color: #7c2d12 !important;
     }
 </style>
-
 <script lang="ts">
     import { page } from "$app/stores";
     import { trpcWithQuery } from "$lib/trpc/client";
@@ -74,6 +73,7 @@
     });
 
     let animate = false;
+    let isExpanded = false; // State to manage the dropdown
 
     onMount(() => {
         animate = true;
@@ -152,6 +152,23 @@
     };
     getAssetsWithNativeBalance();
 
+    // Sorting the usernames based on priority
+    const sortUsernames = (usernames) => {
+        const domainPriority = {
+            'abc': 5,
+            'blink': 3,
+            'bonk': 2,
+            'default': 6,
+            'poor': 4,
+            'sol': 1 // In case other domains appear
+        };
+
+        return usernames.sort((a, b) => {
+            const aDomain = a.username.split('.').pop() || 'default';
+            const bDomain = b.username.split('.').pop() || 'default';
+            return (domainPriority[aDomain] || domainPriority['default']) - (domainPriority[bDomain] || domainPriority['default']);
+        });
+    };
 </script>
 
 <Username
@@ -196,26 +213,8 @@
                 </div>
             {:else if usernames && usernames?.length > 0}
                 <div class="flex flex-wrap gap-2 pt-2">
-                    {#each usernames as username}
-                        {#if username.type === "backpack"}
-                            <div
-                                class="inline-block rounded-full bg-red-200/90 mb-2 px-3 py-1 text-xs font-extrabold text-red-600/90"
-                            >
-                                <div
-                                    class="flex items-center justify-center gap-1"
-                                >
-                                    <Icon
-                                        id="backpack"
-                                        size="sm"
-                                    />
-                                    <!-- <span
-                                            class="flex items-center justify-center"
-                                        > -->
-                                    {username.username}
-                                    <!-- </span> -->
-                                </div>
-                            </div>
-                        {:else}
+                    {#each sortUsernames(usernames) as username, index}
+                        {#if isExpanded || index < 3}
                             <div
                                 class={`username-block mb-2 inline-block rounded-full px-3 py-1 text-xs font-extrabold ${
                                     "domain-" + username.username.split(".")[1]
@@ -225,6 +224,14 @@
                             </div>
                         {/if}
                     {/each}
+                    {#if usernames.length > 3}
+                        <button 
+                            class="text-sm ml-5 text-white-500"
+                            on:click={() => isExpanded = !isExpanded}
+                        >
+                            {isExpanded ? ' ▲' : ` ▼ (${usernames.length - 3})`}
+                        </button>
+                    {/if}
                 </div>
             {/if}
         </div>
