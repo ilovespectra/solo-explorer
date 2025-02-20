@@ -1,5 +1,5 @@
 import { t } from "$lib/trpc/t";
-
+import process from "process";
 import { connect } from "$lib/xray";
 
 const { HELIUS_API_KEY } = process.env;

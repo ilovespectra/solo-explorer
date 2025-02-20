@@ -31,7 +31,7 @@ const getAllDomainsDomain = async (usernames: Username[], address = "") => {
     const parser = new TldParser(connection);
 
     await Promise.allSettled(
-        ["blink", "ser", "bonk", "poor", "abc"].map(async (domain) => {
+        ["blink", "sol", "ser", "bonk", "poor", "abc"].map(async (domain) => {
             const domains = await parser.getParsedAllUserDomainsFromTld(
                 address,
                 domain
