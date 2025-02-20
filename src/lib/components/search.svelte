@@ -244,7 +244,7 @@
         class="relative z-10 grid grid-flow-dense grid-cols-1 py-2 md:grid-cols-4"
     >
         <button
-            class="bg-faint btn-outline btn col-span-4 mb-4 md:ml-2"
+            class="bg-faint btn btn-outline col-span-4 mb-4 md:ml-2"
             on:click|preventDefault={newSearch}
         >
             <span class="text-sm lowercase">go</span>

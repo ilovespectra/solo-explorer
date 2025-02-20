@@ -17,9 +17,6 @@ export const parseTransaction: ProtonParser = (transaction, address) => {
     try {
         return parser(transaction, address);
     } catch (error) {
-        // eslint-disable-next-line no-console
-        console.log(error);
-
         return protonParsers.UNKNOWN(transaction, address);
     }
 };

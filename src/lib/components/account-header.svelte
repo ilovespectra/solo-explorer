@@ -48,6 +48,7 @@
         color: #7c2d12 !important;
     }
 </style>
+
 <script lang="ts">
     import { page } from "$app/stores";
     import { trpcWithQuery } from "$lib/trpc/client";
@@ -73,7 +74,7 @@
     });
 
     let animate = false;
-    let isExpanded = false; 
+    let isExpanded = false;
 
     onMount(() => {
         animate = true;
@@ -87,27 +88,27 @@
 
     const url = import.meta.env.VITE_HELIUS_URL;
 
-    let totalTokensBalance = 0; 
+    let totalTokensBalance = 0;
 
     const getAssetsWithNativeBalance = async () => {
         try {
             const response = await fetch(url, {
                 body: JSON.stringify({
-                    id: 'my-id',
-                    jsonrpc: '2.0',
-                    method: 'searchAssets',
+                    id: "my-id",
+                    jsonrpc: "2.0",
+                    method: "searchAssets",
                     params: {
                         displayOptions: {
                             showNativeBalance: true,
                         },
                         ownerAddress: account,
-                        tokenType: 'fungible',
+                        tokenType: "fungible",
                     },
                 }),
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                method: 'POST',
+                method: "POST",
             });
 
             const { result } = await response.json();
@@ -122,19 +123,18 @@
                         const { symbol, price_info } = asset.token_info;
                         const { total_price } = price_info;
                         const formattedPrice = `$${total_price.toFixed(2)}`;
-
                     });
                 } else {
-                    console.log('No assets with price information found');
+                    // console.log('No assets with price information found');
                 }
 
-                totalTokensBalance = calculateTotalTokens(pricedAssets); 
+                totalTokensBalance = calculateTotalTokens(pricedAssets);
                 return totalTokensBalance;
             } else {
-                console.log('No assets or invalid asset data');
+                // console.log('No assets or invalid asset data');
             }
         } catch (error) {
-            console.error('Error fetching assets:', error);
+            // console.error('Error fetching assets:', error);
         }
     };
     const calculateTotalTokens = (pricedAssets) => {
@@ -151,18 +151,21 @@
 
     const sortUsernames = (usernames) => {
         const domainPriority = {
-            'abc': 5,
-            'blink': 3,
-            'bonk': 2,
-            'default': 6,
-            'poor': 4,
-            'sol': 1 
+            abc: 5,
+            blink: 3,
+            bonk: 2,
+            default: 6,
+            poor: 4,
+            sol: 1,
         };
 
         return usernames.sort((a, b) => {
-            const aDomain = a.username.split('.').pop() || 'default';
-            const bDomain = b.username.split('.').pop() || 'default';
-            return (domainPriority[aDomain] || domainPriority['default']) - (domainPriority[bDomain] || domainPriority['default']);
+            const aDomain = a.username.split(".").pop() || "default";
+            const bDomain = b.username.split(".").pop() || "default";
+            return (
+                (domainPriority[aDomain] || domainPriority["default"]) -
+                (domainPriority[bDomain] || domainPriority["default"])
+            );
         });
     };
 </script>
@@ -176,7 +179,7 @@
         <div class="flex flex-col bg-base-100">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                    <h3 class="relative m-0 text-lg font-bold md:text-l">
+                    <h3 class="md:text-l relative m-0 text-lg font-bold">
                         {account}
                     </h3>
                     <div class="relative flex items-center">
@@ -192,8 +195,7 @@
                 <div class="relative text-right">
                     {#if !$price?.isLoading}
                         <h1 class="text-md md:block">
-                        <span class="">{formatMoney(worth)}</span
-                            >
+                            <span class="">{formatMoney(worth)}</span>
                             <span class="opacity-50">usd</span>
                         </h1>
                     {/if}
@@ -221,11 +223,11 @@
                         {/if}
                     {/each}
                     {#if usernames.length > 3}
-                        <button 
-                            class="text-sm ml-5 text-white-500"
-                            on:click={() => isExpanded = !isExpanded}
+                        <button
+                            class="text-white-500 ml-5 text-sm"
+                            on:click={() => (isExpanded = !isExpanded)}
                         >
-                            {isExpanded ? ' ▲' : ` ▼ (${usernames.length - 3})`}
+                            {isExpanded ? " ▲" : ` ▼ (${usernames.length - 3})`}
                         </button>
                     {/if}
                 </div>

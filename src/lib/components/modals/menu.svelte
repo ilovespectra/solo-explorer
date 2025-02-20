@@ -1,9 +1,4 @@
-{#each [
-    { name: "home", url: "/" }, 
-    { name: "x", url: "https://x.com/soloexplorerxyz" },
-    { name: "docs", url: "https://solo-docs.vercel.app/" },
-    { name: "build", url: "https://github.com/ilovespectra/solo-explorer" }, 
-    { name: "helius", url: "https://helius.xyz" }] as { name, url }}
+{#each [{ name: "home", url: "/" }, { name: "x", url: "https://x.com/soloexplorerxyz" }, { name: "docs", url: "https://solo-docs.vercel.app/" }, { name: "build", url: "https://github.com/ilovespectra/solo-explorer" }, { name: "helius", url: "https://helius.xyz" }] as { name, url }}
     <a
         href={url}
         data-sveltekit-reload

@@ -1,3 +1,36 @@
+<style>
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #a0aec0;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.3s;
+    }
+    input[type="checkbox"]:checked {
+        background-color: #a0aec0;
+    }
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        outline: none;
+        cursor: pointer;
+    }
+    input[type="checkbox"]:checked {
+        background-color: grey;
+    }
+</style>
+
 <script lang="ts">
     import type { ProtonTransaction } from "$lib/xray";
     import { onMount, onDestroy, afterUpdate } from "svelte";
@@ -15,8 +48,8 @@
     import LogMessages from "$lib/components/log-messages.svelte";
     import Transaction from "$lib/components/transaction.svelte";
     import Collapse from "$lib/components/collapse.svelte";
-    import { writable } from 'svelte/store';
-    import { initializeApp } from 'firebase/app';
+    import { writable } from "svelte/store";
+    import { initializeApp } from "firebase/app";
     import {
         getFirestore,
         collection,
@@ -27,8 +60,8 @@
         query,
         where,
         getDocs,
-    } from 'firebase/firestore';
-    
+    } from "firebase/firestore";
+
     import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
     const comments = writable<{ comment: string }[]>([]);
     const publicKey = $walletStore.publicKey;
@@ -41,12 +74,12 @@
         measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
         messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
         projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
     };
     const app = initializeApp(firebaseConfig);
-    
+
     let animate = false;
-    
+
     const signature = $page.params.tx;
 
     const client = trpcWithQuery($page);
@@ -66,7 +99,7 @@
     let fetchCommentsInterval: number;
     let isWalletConnected = $walletStore.publicKey !== null;
     $: isWalletConnected = publicKey !== null;
-    const sentiment = writable('');
+    const sentiment = writable("");
     const fetchPublicKey = () => {
         const wallet = $walletStore;
         const publicKey = wallet.publicKey;
@@ -74,7 +107,6 @@
         if (!publicKey) {
             return;
         }
-    
     };
     const rawTransaction = client.rawTransaction.createQuery(signature || "");
     const account = $page.params.account;
@@ -106,12 +138,12 @@
     };
     // Wallet and comment-related variables
     // const { publicKey } = useWallet();
-    const comment = writable('');
+    const comment = writable("");
     let displayedComments: { comment: string }[] = [];
-    
+
     const fetchComments = async () => {
         const db = getFirestore(app);
-        const commentsRef = collection(db, 'txcomment');
+        const commentsRef = collection(db, "txcomment");
 
         const wallet = $walletStore;
         const publicKey = wallet.publicKey;
@@ -124,114 +156,123 @@
             // Use the transaction signature as part of the query
             const commentsQuery = query(
                 commentsRef,
-                where('walletPublicKey', '==', publicKey.toBase58()),
-                where('account', '==', signature)
+                where("walletPublicKey", "==", publicKey.toBase58()),
+                where("account", "==", signature)
             );
 
             const querySnapshot = await getDocs(commentsQuery);
 
-            const newComments: { comment: string, walletPublicKey: string }[] = querySnapshot.docs
-                .map((doc) => doc.data() as { comment: string, walletPublicKey: string })
-                .filter((comment) => {
-                    const isDisplayed = displayedComments.some(
-                        (displayedComment) => displayedComment.comment === comment.comment
-                    );
-                    return !isDisplayed;
-                });
+            const newComments: { comment: string; walletPublicKey: string }[] =
+                querySnapshot.docs
+                    .map(
+                        (doc) =>
+                            doc.data() as {
+                                comment: string;
+                                walletPublicKey: string;
+                            }
+                    )
+                    .filter((comment) => {
+                        const isDisplayed = displayedComments.some(
+                            (displayedComment) =>
+                                displayedComment.comment === comment.comment
+                        );
+                        return !isDisplayed;
+                    });
 
             // Add the new comments to the displayed comments list
             displayedComments = displayedComments.concat(newComments);
 
             // Update the comments store
-            comments.update((currentComments) => [...currentComments, ...newComments]);
+            comments.update((currentComments) => [
+                ...currentComments,
+                ...newComments,
+            ]);
 
             await fetchAndMapComments(); // Fetch and map comments on wallet connection
-
         } catch (error) {
             // Handle any errors if necessary
             // console.error("Error fetching comments:", error);
         }
-};
+    };
 
-const fetchAndMapComments = async () => {
+    const fetchAndMapComments = async () => {
         const db = getFirestore(app);
-        const commentsRef = collection(db, 'txcomment');
-        
+        const commentsRef = collection(db, "txcomment");
+
         try {
             const querySnapshot = await getDocs(commentsRef);
-            const fetchedComments = querySnapshot.docs.map(doc => ({
+            const fetchedComments = querySnapshot.docs.map((doc) => ({
                 data: doc.data(),
-                id: doc.id
+                id: doc.id,
             }));
-            
+
             // Compare fetched comments with displayed comments and assign IDs
-            displayedComments = displayedComments.map(displayedComment => {
-                const matchingComment = fetchedComments.find(fetchedComment =>
-                    fetchedComment.data.comment === displayedComment.comment
+            displayedComments = displayedComments.map((displayedComment) => {
+                const matchingComment = fetchedComments.find(
+                    (fetchedComment) =>
+                        fetchedComment.data.comment === displayedComment.comment
                 );
-                
+
                 if (matchingComment) {
                     return {
                         ...displayedComment,
-                        id: matchingComment.id
+                        id: matchingComment.id,
                     };
                 }
-                
+
                 return displayedComment;
             });
         } catch (error) {
             // console.error("Error fetching and mapping comments:", error);
         }
-};
+    };
 
-$: {
+    $: {
         if (isWalletConnected) {
             fetchComments();
             fetchPublicKey();
         }
-}
+    }
 
     onMount(() => {
-        fetchComments(); 
+        fetchComments();
         fetchPublicKey();
 
         return () => {
-
             clearInterval(fetchCommentsInterval);
         };
-});
-let checkboxSentiment = '';
-$: {
-        if (checkboxSentiment === '') {
-            sentiment.set('neutral');
+    });
+    let checkboxSentiment = "";
+    $: {
+        if (checkboxSentiment === "") {
+            sentiment.set("neutral");
         } else {
             sentiment.set(checkboxSentiment);
         }
-}
+    }
 
-let commenter = '';
+    let commenter = "";
     $: {
         if (isWalletConnected) {
-            commenter = $walletStore.publicKey?.toBase58() || '';
+            commenter = $walletStore.publicKey?.toBase58() || "";
         }
     }
-    
+
     const submitComment = async () => {
         const commentText = $comment;
         let selectedSentiment = checkboxSentiment;
         // If no sentiment checkbox is selected, set it to 'neutral'
-        if (selectedSentiment === '') {
-            selectedSentiment = 'neutral';
+        if (selectedSentiment === "") {
+            selectedSentiment = "neutral";
         }
         if (commentText) {
             const db = getFirestore(app);
-            const commentsRef = collection(db, 'txcomment');
-            
+            const commentsRef = collection(db, "txcomment");
+
             const wallet = $walletStore;
             const publicKey = wallet.publicKey;
 
             if (!publicKey) {
-               
                 return;
             }
 
@@ -243,10 +284,10 @@ let commenter = '';
                     comment: commentText,
                     sentiment: selectedSentiment,
                     timestamp: serverTimestamp(),
-                    walletPublicKey: publicKey.toBase58(), 
+                    walletPublicKey: publicKey.toBase58(),
                 });
-                comment.set('');
-                fetchComments(); 
+                comment.set("");
+                fetchComments();
             } catch (error) {
                 // Handle the error if necessary
                 // console.error("Error submitting comment:", error);
@@ -255,84 +296,62 @@ let commenter = '';
     };
     const handleCheckbox = (value) => {
         if (checkboxSentiment === value) {
-            checkboxSentiment = ''; // If the same checkbox is clicked again, unselect it
-            sentiment.set('neutral'); // Set sentiment to neutral when unselecting the checkbox
+            checkboxSentiment = ""; // If the same checkbox is clicked again, unselect it
+            sentiment.set("neutral"); // Set sentiment to neutral when unselecting the checkbox
         } else {
             checkboxSentiment = value; // Select the clicked checkbox
             sentiment.set(value); // Set sentiment to the clicked value
         }
-};
-// Update the sentiment value when checkbox changes
-const updateSentiment = (value) => {
-        checkboxSentiment = value === checkboxSentiment ? '' : value;
-        sentiment.set(checkboxSentiment === '' ? 'neutral' : checkboxSentiment);
-};
+    };
+    // Update the sentiment value when checkbox changes
+    const updateSentiment = (value) => {
+        checkboxSentiment = value === checkboxSentiment ? "" : value;
+        sentiment.set(checkboxSentiment === "" ? "neutral" : checkboxSentiment);
+    };
 
-    const removeComment = async (comment: { comment: string }, index: number) => {
+    const removeComment = async (
+        comment: { comment: string },
+        index: number
+    ) => {
         try {
             // console.log(`Deleting comment: ${comment.comment}`);
-            
+
             const db = getFirestore(app);
-            const commentsRef = collection(db, 'txcomment');
+            const commentsRef = collection(db, "txcomment");
 
             const querySnapshot = await getDocs(commentsRef);
-            const docs = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            const docs = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
 
-            const commentToDelete = docs.find((doc) => doc.comment === comment.comment);
+            const commentToDelete = docs.find(
+                (doc) => doc.comment === comment.comment
+            );
 
             if (commentToDelete) {
-                await deleteDoc(doc(db, 'txcomment', commentToDelete.id));
-                
+                await deleteDoc(doc(db, "txcomment", commentToDelete.id));
+
                 // Update displayedComments after successful deletion
                 displayedComments = displayedComments.filter(
-                    (displayedComment) => displayedComment.comment !== comment.comment
+                    (displayedComment) =>
+                        displayedComment.comment !== comment.comment
                 );
 
                 // Update the comments store
                 comments.update((currentComments) =>
                     currentComments.filter(
-                        (currentComment) => currentComment.comment !== comment.comment
+                        (currentComment) =>
+                            currentComment.comment !== comment.comment
                     )
                 );
             }
         } catch (error) {
             // console.error('Error removing comment:', error);
         }
-};
-
+    };
 </script>
-<style>
-    input[type="checkbox"] {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        width: 16px;
-        height: 16px;
-        border: 1px solid #A0AEC0;
-        border-radius: 3px;
-        outline: none;
-        cursor: pointer;
-        position: relative;
-        transition: background-color 0.3s;
-    }
-    input[type="checkbox"]:checked {
-        background-color: #A0AEC0;
-    }
-    input[type="checkbox"] {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #ccc;
-        border-radius: 4px;
-        outline: none;
-        cursor: pointer;
-    }
-    input[type="checkbox"]:checked {
-        background-color: grey;
-    }
-</style>
+
 <div class="content mb-4 mt-4 flex justify-between px-3">
     <h1 class="text-xl font-bold lowercase">Transaction</h1>
     <div
@@ -362,59 +381,68 @@ const updateSentiment = (value) => {
         }}
         class="content pl-2 md:pl-0"
     >
-    <div class="mt-3 mb-5grid mb-3 items-center ml-3 mr-3 gap-3 rounded-lg border p-1 py-3">
-        <h2 class="text-lg font-semibold md:text-sm ml-10 lowercase"><b>add tx comment</b></h2>
-        
-        {#if isWalletConnected}
         <div
-            class="mx-3 mb-5 mt-3 flex items-center justify-between rounded-lg border"
+            class="mb-5grid mb-3 ml-3 mr-3 mt-3 items-center gap-3 rounded-lg border p-1 py-3"
         >
-            <div class="tabs w-full pt-1 lowercase md:w-auto">
-                <div />
-                <a
-                    href={`/account/${commenter}`}
-                    class="tab tab-bordered"
-                    class:tab-active={$page.url.pathname.endsWith(`${commenter}`)}
-                    >transactions</a
+            <h2 class="ml-10 text-lg font-semibold lowercase md:text-sm">
+                <b>add tx comment</b>
+            </h2>
+
+            {#if isWalletConnected}
+                <div
+                    class="mx-3 mb-5 mt-3 flex items-center justify-between rounded-lg border"
                 >
-                <a
-                    href={`/account/${commenter}/tokens`}
-                    class="tab tab-bordered"
-                    class:tab-active={$page.url.pathname.endsWith("/tokens")}
-                    >tokens</a
-                >
-                <a
-                    href={`/account/${commenter}/assets?network=${
-                        isMainnetValue ? "mainnet" : "devnet"
-                    }`}
-                    class="tab-bordered tab"
-                    class:tab-active={$page.url.pathname.endsWith("/assets")}
-                    >assets</a
-                >
-                <a
-                    href={`/account/${commenter}/journal`}
-                    class="tab tab-bordered"
-                    class:tab-active={$page.url.pathname.endsWith("/journal")}
-                    >journal</a
-                >
-                <a
-                    href={`/account/${commenter}/view`}
-                    class="tab tab-bordered"
-                    class:tab-active={$page.url.pathname.endsWith("/view")}
-                    >comments</a
-                >
-                
-                {#if $accountInfo?.data?.value?.owner === ACCOUNT_COMPRESSION_ID.toBase58()}
-                    <a
-                        href={`/account/${$walletStore.publicKey}/concurrent-merkle-tree`}
-                        class="tab tab-bordered"
-                        class:tab-active={$page.url.pathname.endsWith(
-                            "concurrent-merkle-tree"
-                        )}>Concurrent Merkle Tree</a
-                    >
-                {/if}
-            </div>
-            <!-- {#if !$page.url.pathname.endsWith("/tokens") && !$page.url.pathname.endsWith("/assets")}
+                    <div class="tabs w-full pt-1 lowercase md:w-auto">
+                        <div />
+                        <a
+                            href={`/account/${commenter}`}
+                            class="tab tab-bordered"
+                            class:tab-active={$page.url.pathname.endsWith(
+                                `${commenter}`
+                            )}>transactions</a
+                        >
+                        <a
+                            href={`/account/${commenter}/tokens`}
+                            class="tab tab-bordered"
+                            class:tab-active={$page.url.pathname.endsWith(
+                                "/tokens"
+                            )}>tokens</a
+                        >
+                        <a
+                            href={`/account/${commenter}/assets?network=${
+                                isMainnetValue ? "mainnet" : "devnet"
+                            }`}
+                            class="tab tab-bordered"
+                            class:tab-active={$page.url.pathname.endsWith(
+                                "/assets"
+                            )}>assets</a
+                        >
+                        <a
+                            href={`/account/${commenter}/journal`}
+                            class="tab tab-bordered"
+                            class:tab-active={$page.url.pathname.endsWith(
+                                "/journal"
+                            )}>journal</a
+                        >
+                        <a
+                            href={`/account/${commenter}/view`}
+                            class="tab tab-bordered"
+                            class:tab-active={$page.url.pathname.endsWith(
+                                "/view"
+                            )}>comments</a
+                        >
+
+                        {#if $accountInfo?.data?.value?.owner === ACCOUNT_COMPRESSION_ID.toBase58()}
+                            <a
+                                href={`/account/${$walletStore.publicKey}/concurrent-merkle-tree`}
+                                class="tab tab-bordered"
+                                class:tab-active={$page.url.pathname.endsWith(
+                                    "concurrent-merkle-tree"
+                                )}>Concurrent Merkle Tree</a
+                            >
+                        {/if}
+                    </div>
+                    <!-- {#if !$page.url.pathname.endsWith("/tokens") && !$page.url.pathname.endsWith("/assets")}
                 <button
                     class="btn-ghost btn-sm btn"
                     on:click={() => showModal("TRANSACTION_FILTER")}
@@ -422,72 +450,75 @@ const updateSentiment = (value) => {
                     <Icon id="settings" />
                 </button>
             {/if} -->
+                </div>
+                <textarea
+                    class="text-input ml-10 mt-5"
+                    placeholder="type your comment here"
+                    bind:value={$comment}
+                    style="background-color: #696969"
+                />
+                <br />
+
+                <!-- Checkboxes for bullish and bearish sentiments -->
+                <div class="ml-10 mt-5 flex items-center">
+                    <label class="mr-5 flex items-center">
+                        <input
+                            type="checkbox"
+                            checked={checkboxSentiment === "bullish"}
+                            value="bullish"
+                            on:change={() => handleCheckbox("bullish")}
+                        />
+                        <span class="ml-2 text-green-500">&#8593;</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input
+                            type="checkbox"
+                            checked={checkboxSentiment === "bearish"}
+                            value="bearish"
+                            on:change={() => handleCheckbox("bearish")}
+                        />
+                        <span class="ml-2 text-red-500">&#8595;</span>
+                    </label>
+                </div>
+                <button
+                    class="btn mb-10 ml-10 mt-5 lowercase"
+                    on:click={submitComment}
+                >
+                    submit comment
+                </button>
+            {:else}
+                <p class="ml-10 text-gray-500">
+                    connect your wallet to comment on this transaction.
+                </p>
+            {/if}
+
+            {#if $comments.length > 0}
+                {#each $comments as comment, index}
+                    <div class="badge mb-3 ml-5 mr-5 flex items-center px-3">
+                        {#if comment.sentiment === "bullish"}
+                            <span class="mr-2 text-green-500">&#8593;</span>
+                        {:else if comment.sentiment === "bearish"}
+                            <span class="mr-2 text-red-500">&#8595;</span>
+                        {/if}
+                        <p class="text-base">{comment.comment}</p>
+                        <button
+                            on:click={() => removeComment(comment, index)}
+                            class="ml-2 text-gray-500 transition-colors hover:text-black"
+                        >
+                            X
+                        </button>
+                    </div>
+                {/each}
+            {:else}
+                <div class="ml-5 mt-5">
+                    <p>no comments available.</p>
+                </div>
+            {/if}
+
+            <div class="content px-3">
+                <slot />
+            </div>
         </div>
-        <textarea
-        class="text-input mt-5 ml-10"
-        placeholder="type your comment here"
-        bind:value={$comment}
-        style="background-color: #696969"
-      ></textarea>
-      <br />
-
-      <!-- Checkboxes for bullish and bearish sentiments -->
-      <div class="mt-5 ml-10 flex items-center">
-          <label class="mr-5 flex items-center">
-              <input
-                  type="checkbox"
-                  checked={checkboxSentiment === 'bullish'}
-                  value="bullish"
-                  on:change={() => handleCheckbox('bullish')}
-              />
-              <span class="text-green-500 ml-2">&#8593;</span>
-          </label>
-          <label class="flex items-center">
-              <input
-                  type="checkbox"
-                  checked={checkboxSentiment === 'bearish'}
-                  value="bearish"
-                  on:change={() => handleCheckbox('bearish')}
-              />
-              <span class="text-red-500 ml-2">&#8595;</span>
-          </label>
-        </div>
-      <button class="btn lowercase mb-10 mt-5 ml-10" on:click={submitComment}>
-        submit comment
-      </button>
-    {:else}
-      <p class="ml-10 text-gray-500">
-        connect your wallet to comment on this transaction.
-      </p>
-    {/if}
-
-    {#if $comments.length > 0}
-    {#each $comments as comment, index}
-      <div class="mb-3 ml-5 px-3 badge mr-5 flex items-center">
-        {#if comment.sentiment === 'bullish'}
-          <span class="text-green-500 mr-2">&#8593;</span>
-        {:else if comment.sentiment === 'bearish'}
-          <span class="text-red-500 mr-2">&#8595;</span>
-        {/if}
-        <p class="text-base">{comment.comment}</p>
-        <button
-          on:click={() => removeComment(comment, index)}
-          class="ml-2 text-gray-500 hover:text-black transition-colors"
-    >
-        X
-    </button>
-</div>
-{/each}
-{:else}
-<div class="ml-5 mt-5">
-  <p>no comments available.</p>
-</div>
-{/if}
-
-<div class="content px-3">
-    <slot />
-</div>
-</div>
         {#if $transaction.isLoading}
             {#each Array(3) as _}
                 <div class="py-2">
@@ -535,14 +566,16 @@ const updateSentiment = (value) => {
                             class="col-span-10 flex items-center justify-between md:col-span-11"
                         >
                             <div>
-                                <h4 class="text-lg font-semibold md:text-sm lowercase">
+                                <h4
+                                    class="text-lg font-semibold lowercase md:text-sm"
+                                >
                                     Status
                                 </h4>
                                 <h3 class="mr-2 text-xs opacity-50">
                                     This transaction has failed.
                                 </h3>
                             </div>
-                            <div class="badge-error badge mr-1">Error</div>
+                            <div class="badge badge-error mr-1">Error</div>
                         </div>
                     {:else}
                         <div class="col-span-2 p-1 md:col-span-1">
@@ -560,14 +593,18 @@ const updateSentiment = (value) => {
                             class="col-span-10 flex items-center justify-between md:col-span-11"
                         >
                             <div>
-                                <h4 class="text-lg font-semibold md:text-sm lowercase">
+                                <h4
+                                    class="text-lg font-semibold lowercase md:text-sm"
+                                >
                                     Status
                                 </h4>
-                                <h3 class="mr-2 text-xs opacity-50 lowercase">
+                                <h3 class="mr-2 text-xs lowercase opacity-50">
                                     This transaction has successfully processed.
                                 </h3>
                             </div>
-                            <div class="badge-success badge mr-1 lowercase">Success</div>
+                            <div class="badge badge-success mr-1 lowercase">
+                                Success
+                            </div>
                         </div>
                     {/if}
                 </div>
@@ -590,14 +627,18 @@ const updateSentiment = (value) => {
                         class="col-span-10 flex items-center justify-between pr-1 md:col-span-11"
                     >
                         <div>
-                            <h4 class="text-lg font-semibold md:text-sm lowercase">
+                            <h4
+                                class="text-lg font-semibold lowercase md:text-sm"
+                            >
                                 Network Fee
                             </h4>
-                            <h3 class="mr-2 text-xs opacity-50 lowercase">
+                            <h3 class="mr-2 text-xs lowercase opacity-50">
                                 Cost for processing this transaction.
                             </h3>
                         </div>
-                        <p class="text-xs md:text-sm lowercase">{data.fee} sol</p>
+                        <p class="text-xs lowercase md:text-sm">
+                            {data.fee} sol
+                        </p>
                     </div>
                 </div>
             </div>
@@ -620,10 +661,12 @@ const updateSentiment = (value) => {
                         class="col-span-10 flex items-center justify-between pr-1 md:col-span-11"
                     >
                         <div>
-                            <h4 class="text-lg font-semibold md:text-sm lowercase">
+                            <h4
+                                class="text-lg font-semibold lowercase md:text-sm"
+                            >
                                 Slot
                             </h4>
-                            <h3 class="mr-2 text-xs opacity-50 lowercase">
+                            <h3 class="mr-2 text-xs lowercase opacity-50">
                                 The slot this transaction happened on.
                             </h3>
                         </div>
@@ -659,7 +702,9 @@ const updateSentiment = (value) => {
                             class="col-span-10 flex items-center justify-between pr-1 md:col-span-11"
                         >
                             <div class="py-1">
-                                <h4 class="text-lg font-semibold md:text-sm lowercase">
+                                <h4
+                                    class="text-lg font-semibold lowercase md:text-sm"
+                                >
                                     solo: description
                                 </h4>
                                 <p class="break-all text-xs opacity-50">
@@ -703,8 +748,6 @@ const updateSentiment = (value) => {
                     </div>
                 </Collapse>
             </div>
-
-            
 
             {#if rawData}
                 <div class="px-3 pt-3">
