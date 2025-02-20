@@ -46,7 +46,7 @@
                 rel="noreferrer"
             >
                 <img
-                    src="/src/lib/assets/helius/helius-icon.png"
+                    src="src/public/helius-icon.png"
                     alt="Helius Icon"
                     class="mr-2 h-8 w-auto"
                 />
