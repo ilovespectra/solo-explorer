@@ -16,7 +16,7 @@ export const tps = t.procedure.query(async () => {
                 id: 1,
                 jsonrpc: "2.0",
                 method: "getRecentPerformanceSamples",
-                params: [5], // Fetch the last 5 samples
+                params: [5],
             }),
             headers: {
                 "Content-Type": "application/json",
@@ -35,14 +35,10 @@ export const tps = t.procedure.query(async () => {
         if (!result || result.length === 0) {
             throw new Error("No performance samples found.");
         }
-
-        // Define types for the reduce callback parameters
         interface PerformanceSample {
             numTransactions: number;
             samplePeriodSecs: number;
         }
-
-        // Calculate average TPS from the samples
         const totalTransactions = result.reduce(
             (sum: number, sample: PerformanceSample) =>
                 sum + sample.numTransactions,
@@ -55,9 +51,8 @@ export const tps = t.procedure.query(async () => {
         );
         const averageTPS = totalTransactions / totalSeconds;
 
-        return averageTPS.toFixed(2); // Return TPS rounded to 2 decimal places
+        return averageTPS.toFixed(2);
     } catch (error) {
-        // Narrow down the type of the error
         if (error instanceof Error) {
             throw new Error(`Error fetching TPS: ${error.message}`);
         } else {

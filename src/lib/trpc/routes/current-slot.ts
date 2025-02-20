@@ -40,7 +40,6 @@ export const currentSlot = t.procedure.query(async () => {
 
         return result;
     } catch (error) {
-        // Narrow down the type of the error
         if (error instanceof Error) {
             throw new Error(`Error fetching current slot: ${error.message}`);
         } else {

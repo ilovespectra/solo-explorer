@@ -8,7 +8,7 @@ import { connect } from "$lib/xray";
 
 // TODO: add output validation once this merges with the token endpoint
 export const asset = t.procedure.input(z.string()).query(async ({ input }) => {
-    const url = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+    const url = `https://optimistic-daisy-fast-mainnet.helius-rpc.com`;
 
     const response = await fetch(url, {
         body: JSON.stringify({

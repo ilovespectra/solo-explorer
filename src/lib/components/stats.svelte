@@ -13,7 +13,6 @@
 </script>
 
 <div class="flex h-8 w-full items-center justify-center text-xs">
-    <!-- TPS Section -->
     <div class="mr-4">
         {#if !$tps.isLoading}
             <div in:fade={{ duration: 500 }}>
@@ -24,8 +23,6 @@
             <div class="pulse my-2 h-2 w-16 rounded-lg bg-secondary" />
         {/if}
     </div>
-
-    <!-- Price Section -->
     <div class="mr-4">
         {#if !$price.isLoading}
             <div in:fade={{ duration: 500 }}>
@@ -36,8 +33,6 @@
             <div class="pulse my-2 h-2 w-20 rounded-lg bg-secondary" />
         {/if}
     </div>
-
-    <!-- Current Slot Section -->
     <div>
         {#if !$slot.isLoading}
             <div in:fade={{ duration: 500 }}>

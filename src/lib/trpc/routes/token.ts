@@ -8,7 +8,7 @@ export const token = t.procedure
     .input(z.array(z.string()))
     .query(async ({ input }) => {
         const response = await fetch(
-            `https://api.helius.xyz/v0/token-metadata/?api-key=${HELIUS_API_KEY}`,
+            `https://optimistic-daisy-fast-mainnet.helius-rpc.com`,
             {
                 body: JSON.stringify({
                     includeOffChain: true,

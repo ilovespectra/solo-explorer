@@ -12,7 +12,7 @@ export const token2022 = t.procedure
         );
 
         const walletPublicKey = new PublicKey(input);
-        const url = `https://icarus.helius.xyz/?api-key=${HELIUS_API_KEY}`;
+        const url = `https://optimistic-daisy-fast-mainnet.helius-rpc.com`;
 
         const response = await fetch(url, {
             body: JSON.stringify({

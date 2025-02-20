@@ -86,7 +86,7 @@
 
     $: worth = totalTokensBalance + $balance * $price?.data;
 
-    const url = import.meta.env.VITE_HELIUS_URL;
+    const url = "https://optimistic-daisy-fast-mainnet.helius-rpc.com";
 
     let totalTokensBalance = 0;
 
