@@ -47,7 +47,7 @@
             >
                 <img
                     src="/src/lib/assets/helius/helius-icon.png"
-                    alt="solo icon"
+                    alt="Helius Icon"
                     class="mr-2 h-8 w-auto"
                 />
                 <span class="text-3xl lowercase">solo:</span>
