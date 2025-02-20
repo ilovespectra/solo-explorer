@@ -1,15 +1,67 @@
-import { Helius } from "helius-sdk";
 import { t } from "$lib/trpc/t";
 import process from "process";
 
-export const tps = t.procedure.query(async () => {
-    const heliusApiKey = process.env.HELIUS_API_KEY;
+const { HELIUS_API_KEY } = process.env;
 
-    if (heliusApiKey) {
-        const helius = new Helius(heliusApiKey);
-        const tps = await helius.rpc.getCurrentTPS();
-        return tps;
-    } else {
+export const tps = t.procedure.query(async () => {
+    if (!HELIUS_API_KEY) {
         throw new Error("HELIUS_API_KEY environment variable is not defined.");
+    }
+
+    const HELIUS_RPC_URL = `https://optimistic-daisy-fast-mainnet.helius-rpc.com`;
+
+    try {
+        const response = await fetch(HELIUS_RPC_URL, {
+            body: JSON.stringify({
+                id: 1,
+                jsonrpc: "2.0",
+                method: "getRecentPerformanceSamples",
+                params: [5], // Fetch the last 5 samples
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+            method: "POST",
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch performance samples: ${response.statusText}`
+            );
+        }
+
+        const { result } = await response.json();
+
+        if (!result || result.length === 0) {
+            throw new Error("No performance samples found.");
+        }
+
+        // Define types for the reduce callback parameters
+        interface PerformanceSample {
+            numTransactions: number;
+            samplePeriodSecs: number;
+        }
+
+        // Calculate average TPS from the samples
+        const totalTransactions = result.reduce(
+            (sum: number, sample: PerformanceSample) =>
+                sum + sample.numTransactions,
+            0
+        );
+        const totalSeconds = result.reduce(
+            (sum: number, sample: PerformanceSample) =>
+                sum + sample.samplePeriodSecs,
+            0
+        );
+        const averageTPS = totalTransactions / totalSeconds;
+
+        return averageTPS.toFixed(2); // Return TPS rounded to 2 decimal places
+    } catch (error) {
+        // Narrow down the type of the error
+        if (error instanceof Error) {
+            throw new Error(`Error fetching TPS: ${error.message}`);
+        } else {
+            throw new Error(`Error fetching TPS: ${String(error)}`);
+        }
     }
 });
