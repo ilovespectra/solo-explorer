@@ -46,7 +46,7 @@
                 rel="noreferrer"
             >
                 <img
-                    src="src/public/helius-icon.png"
+                    src="https://github.com/ilovespectra/solo-explorer/blob/main/src/public/helius-icon.png?raw=true"
                     alt="Helius Icon"
                     class="mr-2 h-8 w-auto"
                 />
