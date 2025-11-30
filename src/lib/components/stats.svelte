@@ -20,7 +20,7 @@
                 <span class="opacity-50">{$tps?.data}</span>
             </div>
         {:else}
-            <div class="pulse my-2 h-2 w-16 rounded-lg bg-secondary" />
+            <div class="pulse bg-secondary my-2 h-2 w-16 rounded-lg" />
         {/if}
     </div>
     <div class="mr-4">
@@ -30,7 +30,7 @@
                 <span class="opacity-50">{formatMoney($price?.data)}</span>
             </div>
         {:else}
-            <div class="pulse my-2 h-2 w-20 rounded-lg bg-secondary" />
+            <div class="pulse bg-secondary my-2 h-2 w-20 rounded-lg" />
         {/if}
     </div>
     <div>
@@ -41,14 +41,14 @@
                     <a
                         data-sveltekit-reload
                         href="/block/{$slot?.data}"
-                        class="pointer-events-auto hover:link-success"
+                        class="hover:link-success pointer-events-auto"
                     >
                         {$slot?.data?.toLocaleString()}
                     </a>
                 </span>
             </div>
         {:else}
-            <div class="pulse my-2 h-2 w-32 rounded-lg bg-secondary" />
+            <div class="pulse bg-secondary my-2 h-2 w-32 rounded-lg" />
         {/if}
     </div>
 </div>

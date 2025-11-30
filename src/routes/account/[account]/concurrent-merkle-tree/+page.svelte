@@ -21,7 +21,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="key"
                         size="sm"
@@ -42,7 +42,7 @@
                     <a
                         data-sveltekit-reload
                         href="/account/{$cmt.data?.authority}"
-                        class="pointer-events-auto text-xs hover:link-success md:text-sm"
+                        class="hover:link-success pointer-events-auto text-xs md:text-sm"
                     >
                         {shortenString($cmt.data?.authority)}
                     </a>
@@ -55,7 +55,7 @@
             >
                 <div class="col-span-2 p-1 md:col-span-1">
                     <div
-                        class="center ml-1 h-10 w-10 rounded-full bg-secondary"
+                        class="center bg-secondary ml-1 h-10 w-10 rounded-full"
                     >
                         <Icon
                             id="box"
@@ -76,7 +76,7 @@
                     </div>
                     <a
                         href="/block/{$cmt.data?.creationSlot}"
-                        class="pointer-events-auto text-xs hover:link-success md:text-sm"
+                        class="hover:link-success pointer-events-auto text-xs md:text-sm"
                     >
                         {$cmt.data?.creationSlot.toLocaleString()}
                     </a>
@@ -87,7 +87,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="tree"
                         size="sm"
@@ -110,7 +110,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="cloudTransfer"
                         size="sm"
@@ -136,7 +136,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="trees"
                         size="sm"
@@ -162,7 +162,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="cycle"
                         size="sm"
@@ -189,7 +189,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="codeFork"
                         size="sm"
@@ -219,7 +219,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="leaf"
                         size="sm"
@@ -246,7 +246,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="hourglass"
                         size="sm"
@@ -278,7 +278,7 @@
             class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg border p-1 py-3"
         >
             <div class="col-span-2 p-1 md:col-span-1">
-                <div class="center ml-1 h-10 w-10 rounded-full bg-secondary">
+                <div class="center bg-secondary ml-1 h-10 w-10 rounded-full">
                     <Icon
                         id="plus"
                         size="sm"

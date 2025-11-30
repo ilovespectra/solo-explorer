@@ -357,10 +357,10 @@
         </div>
     {:else}
         <div
-            class="nav content sticky top-14 z-30 bg-base-100 px-3 py-2 lowercase"
+            class="nav content bg-base-100 sticky top-14 z-30 px-3 py-2 lowercase"
         >
             <div
-                class="relative flex flex-wrap items-center justify-between bg-base-100"
+                class="bg-base-100 relative flex flex-wrap items-center justify-between"
             >
                 <div>
                     <h3 class="m-0 text-xl font-bold md:text-3xl">

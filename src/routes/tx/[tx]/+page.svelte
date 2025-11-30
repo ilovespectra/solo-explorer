@@ -615,7 +615,7 @@
                 >
                     <div class="col-span-2 p-1 md:col-span-1">
                         <div
-                            class="center ml-1 h-10 w-10 rounded-full bg-secondary"
+                            class="center bg-secondary ml-1 h-10 w-10 rounded-full"
                         >
                             <Icon
                                 id="network"
@@ -649,7 +649,7 @@
                 >
                     <div class="col-span-2 p-1 md:col-span-1">
                         <div
-                            class="center ml-1 h-10 w-10 rounded-full bg-secondary"
+                            class="center bg-secondary ml-1 h-10 w-10 rounded-full"
                         >
                             <Icon
                                 id="box"
@@ -673,7 +673,7 @@
                         <a
                             data-sveltekit-reload
                             href="/block/{data?.raw?.slot}"
-                            class="pointer-events-auto text-xs hover:link-success md:text-sm"
+                            class="hover:link-success pointer-events-auto text-xs md:text-sm"
                         >
                             {data?.raw?.slot?.toLocaleString()}
                         </a>
@@ -690,7 +690,7 @@
                     >
                         <div class="col-span-2 p-1 md:col-span-1">
                             <div
-                                class="center ml-1 h-10 w-10 rounded-full bg-secondary"
+                                class="center bg-secondary ml-1 h-10 w-10 rounded-full"
                             >
                                 <Icon
                                     id="info"

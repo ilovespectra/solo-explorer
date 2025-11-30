@@ -23,14 +23,14 @@
     // Helper function to get safe CSS classes
     function getLogClass(style: string) {
         const styleMap: Record<string, string> = {
-            'error': 'text-red-600',
-            'info': 'text-cyan-600',
-            'sky': 'text-cyan-600',
-            'success': 'text-green-600',
-            'tangerine': 'text-[#e8a034]',
-            'warning': 'text-yellow-600'
+            error: "text-red-600",
+            info: "text-cyan-600",
+            sky: "text-cyan-600",
+            success: "text-green-600",
+            tangerine: "text-[#e8a034]",
+            warning: "text-yellow-600",
         };
-        return styleMap[style] || 'text-gray-600';
+        return styleMap[style] || "text-gray-600";
     }
 </script>
 

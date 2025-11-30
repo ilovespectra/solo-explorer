@@ -163,7 +163,7 @@
     <div class="dropdown w-full">
         <input
             bind:this={inputEl}
-            class="input input-bordered h-10 w-full rounded-lg lowercase focus:input-primary"
+            class="input input-bordered focus:input-primary h-10 w-full rounded-lg lowercase"
             class:h-14={size === "lg"}
             placeholder="Search Solana"
             tabindex="0"
@@ -179,7 +179,7 @@
         />
         {#if recent.length > 0 && size !== "sm"}
             <ul
-                class="dropdown-content relative my-3 w-full rounded-lg border bg-base-100 p-2 px-4 shadow"
+                class="dropdown-content bg-base-100 relative my-3 w-full rounded-lg border p-2 px-4 shadow"
             >
                 <div class="flex flex-wrap items-center justify-between">
                     <p class="text-md mb-1 mt-2">recents</p>
@@ -197,7 +197,7 @@
                                 class="m1-ds2 relative z-30 w-full truncate px-0 hover:opacity-60"
                             >
                                 <a
-                                    class="block w-full max-w-full text-ellipsis rounded-lg px-1 py-2 text-left hover:bg-secondary"
+                                    class="hover:bg-secondary block w-full max-w-full text-ellipsis rounded-lg px-1 py-2 text-left"
                                     data-sveltekit-reload
                                     href={recentSearch.url}
                                 >

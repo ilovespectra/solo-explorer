@@ -42,7 +42,7 @@
 <div>
     <a
         href="/tx/{transaction.signature}"
-        class="gradient relative block w-full rounded-lg border border-transparent bg-black pb-1 text-left lowercase hover:border-primary"
+        class="gradient hover:border-primary relative block w-full rounded-lg border border-transparent bg-black pb-1 text-left lowercase"
     >
         <div
             class="pointer-events-none relative grid grid-cols-12 gap-3 rounded-lg"
@@ -87,7 +87,7 @@
                                 <a
                                     data-sveltekit-reload
                                     href="/tx/{transaction.signature}"
-                                    class="link-neutral pointer-events-auto border border-x-0 border-t-0 border-dotted text-xs hover:link-success"
+                                    class="link-neutral hover:link-success pointer-events-auto border border-x-0 border-t-0 border-dotted text-xs"
                                 >
                                     {transaction.signature
                                         ? shortenString(
@@ -145,7 +145,7 @@
                                             class="col-span-2 p-1 md:col-span-1"
                                         >
                                             <div
-                                                class="max-height-10 aspect-square w-full rounded-full bg-secondary"
+                                                class="max-height-10 bg-secondary aspect-square w-full rounded-full"
                                             />
                                         </div>
                                         <div
@@ -153,14 +153,14 @@
                                         >
                                             <div>
                                                 <div
-                                                    class="mb-2 h-3 w-32 animate-pulse rounded-full bg-secondary"
+                                                    class="bg-secondary mb-2 h-3 w-32 animate-pulse rounded-full"
                                                 />
                                                 <div
-                                                    class="h-2 w-20 animate-pulse rounded-full bg-secondary"
+                                                    class="bg-secondary h-2 w-20 animate-pulse rounded-full"
                                                 />
                                             </div>
                                             <div
-                                                class="h-2 w-5 animate-pulse rounded-full bg-secondary"
+                                                class="bg-secondary h-2 w-5 animate-pulse rounded-full"
                                             />
                                         </div>
                                     </div>
@@ -190,7 +190,7 @@
                                                         />
                                                     {:else}
                                                         <div
-                                                            class="flex aspect-square w-8 items-center justify-center rounded-lg bg-secondary opacity-50"
+                                                            class="bg-secondary flex aspect-square w-8 items-center justify-center rounded-lg opacity-50"
                                                         >
                                                             <Icon
                                                                 id="image"
@@ -228,7 +228,7 @@
                                                         <div class="flex">
                                                             {#if action?.actionType?.includes("SENT") && action.to}
                                                                 <p
-                                                                    class="mr-1 text-xs text-neutral"
+                                                                    class="text-neutral mr-1 text-xs"
                                                                 >
                                                                     Sent to
                                                                 </p>
@@ -239,7 +239,7 @@
                                                                     <a
                                                                         data-sveltekit-reload
                                                                         href="/account/{action.to}"
-                                                                        class="link-neutral pointer-events-auto border border-x-0 border-t-0 border-dotted hover:link-success"
+                                                                        class="link-neutral hover:link-success pointer-events-auto border border-x-0 border-t-0 border-dotted"
                                                                     >
                                                                         {shortenString(
                                                                             action.to
@@ -248,7 +248,7 @@
                                                                 </h3>
                                                             {:else if action?.actionType?.includes("RECEIVED") && action.from}
                                                                 <p
-                                                                    class="mr-1 text-xs text-neutral"
+                                                                    class="text-neutral mr-1 text-xs"
                                                                 >
                                                                     Received
                                                                     from
@@ -259,7 +259,7 @@
                                                                 >
                                                                     <a
                                                                         href="/account/{action.from}"
-                                                                        class="link-neutral pointer-events-auto border border-x-0 border-t-0 border-dotted hover:link-success"
+                                                                        class="link-neutral hover:link-success pointer-events-auto border border-x-0 border-t-0 border-dotted"
                                                                     >
                                                                         {shortenString(
                                                                             action.from
@@ -274,7 +274,7 @@
                                                                         <a
                                                                             data-sveltekit-reload
                                                                             href="/account/{action.from}"
-                                                                            class="link-neutral pointer-events-auto border border-x-0 border-t-0 border-dotted hover:link-success"
+                                                                            class="link-neutral hover:link-success pointer-events-auto border border-x-0 border-t-0 border-dotted"
                                                                         >
                                                                             {shortenString(
                                                                                 action.from
@@ -298,7 +298,7 @@
                                                                         <a
                                                                             data-sveltekit-reload
                                                                             href="/account/{action.to}"
-                                                                            class="link-neutral pointer-events-auto border border-x-0 border-t-0 border-dotted hover:link-success"
+                                                                            class="link-neutral hover:link-success pointer-events-auto border border-x-0 border-t-0 border-dotted"
                                                                         >
                                                                             {shortenString(
                                                                                 action.to
@@ -312,7 +312,7 @@
                                                 </div>
                                                 <div class="mr-2">
                                                     <div
-                                                        class="absolute -left-3 top-1/2 h-0.5 w-3 -translate-y-1/2 rounded-full bg-secondary"
+                                                        class="bg-secondary absolute -left-3 top-1/2 h-0.5 w-3 -translate-y-1/2 rounded-full"
                                                     />
                                                     {#if action?.actionType?.includes("RECEIVED") || action?.actionType?.includes("NFT_SELL") || action?.actionType?.includes("AIRDROP")}
                                                         <h3

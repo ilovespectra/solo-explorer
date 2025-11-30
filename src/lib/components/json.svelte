@@ -25,7 +25,7 @@
 >
     <div class="mt-3 grid grid-cols-12 items-center gap-3 rounded-lg p-1">
         <div class="col-span-2 p-1 md:col-span-1">
-            <div class="center h-10 w-10 rounded-full bg-secondary">
+            <div class="center bg-secondary h-10 w-10 rounded-full">
                 <Icon
                     id="json"
                     size="sm"

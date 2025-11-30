@@ -50,9 +50,9 @@
         >
     </div>
 
-    <div class="nav sticky top-14 z-30 bg-base-100 px-3 md:pt-3">
+    <div class="nav bg-base-100 sticky top-14 z-30 px-3 md:pt-3">
         <div
-            class="content flex flex-wrap items-center justify-between bg-base-100"
+            class="content bg-base-100 flex flex-wrap items-center justify-between"
         >
             <div class="flex items-center">
                 <h3 class="relative m-0 text-lg font-bold md:text-2xl">

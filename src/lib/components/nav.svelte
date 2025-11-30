@@ -16,13 +16,11 @@
 
         try {
             await showConnectWallet();
-
-        } catch (error) {
-        }
+        } catch (error) {}
     };
 
     const openSoloSwap = () => {
-        window.location.href = 'https://solo-swap-v2.vercel.app';
+        window.location.href = "https://solo-swap-v2.vercel.app";
     };
 
     onMount(() => {
@@ -70,7 +68,7 @@
         >
             <span class="text-sm lowercase">try solo: swap</span>
         </button>
-        
+
         <div class="flex justify-end pr-2">
             <button
                 class="btn btn-ghost"

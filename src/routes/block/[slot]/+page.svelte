@@ -49,9 +49,9 @@
 
 <div class="max-w-screen content pt-5">
     <div class="relative mx-auto w-full max-w-2xl pb-32">
-        <div class="nav sticky top-16 z-30 bg-base-100 px-3 pt-2">
+        <div class="nav bg-base-100 sticky top-16 z-30 px-3 pt-2">
             <div
-                class="flex flex-wrap items-center justify-between bg-base-100"
+                class="bg-base-100 flex flex-wrap items-center justify-between"
             >
                 <div>
                     <h3 class="relative m-0 text-lg font-bold md:text-2xl">
