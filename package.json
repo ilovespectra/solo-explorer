@@ -131,6 +131,7 @@
         "svelte-intersection-observer": "^0.10.0",
         "trpc-svelte-query-adapter": "^2.0.0",
         "trpc-sveltekit": "^3.3.1",
+        "update": "^0.7.4",
         "web3": "^4.1.2",
         "xray": "^0.5.1",
         "zod": "^3.20.6",
