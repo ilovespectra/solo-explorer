@@ -15,13 +15,9 @@
         event.preventDefault();
 
         try {
-            // Trigger the wallet connection
             await showConnectWallet();
 
-            // No need to track connected status here
         } catch (error) {
-            // Handle errors during wallet connection if needed
-            // console.error("Error connecting wallet:", error);
         }
     };
 
@@ -100,12 +96,10 @@
             on:click={connectWallet}
         >
             {#if $walletStore.connected}
-                <!-- If wallet is connected, display abbreviated public key -->
                 <span class="text-sm capitalize">
                     {$walletStore.publicKey?.toBase58()?.slice(0, 8) || ""}...
                 </span>
             {:else}
-                <!-- If wallet is not connected, display default text -->
                 <span class="text-sm lowercase"
                     >{isBackpack ? "🎒" : ""}Connect Wallet</span
                 >

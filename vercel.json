@@ -1,5 +1,10 @@
 {
     "buildCommand": "npm run build",
     "installCommand": "npm install",
-    "outputDirectory": ".svelte-kit"
+    "outputDirectory": ".svelte-kit",
+    "functions": {
+        "**/*.ts": {
+            "runtime": "nodejs20.x"
+        }
+    }
 }
