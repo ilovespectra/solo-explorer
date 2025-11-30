@@ -1,4 +1,4 @@
-import adapter from "@sveltejs/adapter-auto";
+import adapter from "@sveltejs/adapter-vercel";
 import preprocess from "svelte-preprocess";
 
 /** @type {import("@sveltejs/kit").Config} */
@@ -10,11 +10,8 @@ const config = {
     preprocess: [
         preprocess({
             postcss: true,
-
-            // Enable TypeScript
             typescript: {
-                // You can specify the tsconfig file directly
-                tsconfigFile: "./tsconfig.json", // Path to your tsconfig.json file
+                tsconfigFile: "./tsconfig.json",
             },
         }),
     ],
