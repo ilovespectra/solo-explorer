@@ -1,6 +1,6 @@
 <style>
     .text-sky {
-        @apply text-info-content;
+        @apply text-cyan-600; /* FIXED: replaced text-info-content */
     }
 
     .text-tangerine {
@@ -19,6 +19,19 @@
         (sum, log) => sum + log.computeUnits,
         0
     );
+
+    // Helper function to get safe CSS classes
+    function getLogClass(style: string) {
+        const styleMap: Record<string, string> = {
+            'error': 'text-red-600',
+            'info': 'text-cyan-600',
+            'sky': 'text-cyan-600',
+            'success': 'text-green-600',
+            'tangerine': 'text-[#e8a034]',
+            'warning': 'text-yellow-600'
+        };
+        return styleMap[style] || 'text-gray-600';
+    }
 </script>
 
 <div class="pt-0">
@@ -45,17 +58,16 @@
             </p>
         {/if}
         {#each instruction.logs as log}
-            <p class={`px-3 pb-1 text-sm text-${log.style}`}>
-                <span class={`mr-1 text-${log.style}`}>{log.prefix}</span><span
-                    class={``}>{log.text}</span
-                >
+            <p class="px-3 pb-1 text-sm {getLogClass(log.style)}">
+                <span class="mr-1 {getLogClass(log.style)}">{log.prefix}</span>
+                <span>{log.text}</span>
             </p>
         {/each}
     {/each}
 </div>
 
 {#if totalComputeUnits > 0}
-    <hr class="mx-3 my-1 border border-neutral opacity-80" />
+    <hr class="mx-3 my-1 border border-neutral-400 opacity-80" />
     <div class="px-3 pt-1 text-sm">
         {`${totalComputeUnits} compute units consumed`}
     </div>

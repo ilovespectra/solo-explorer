@@ -43,11 +43,16 @@ input::placeholder {
 }
 
 .border {
-    @apply border-secondary;
+    @apply border-gray-400;
 }
 
 .card {
-    @apply rounded-lg border border-secondary bg-black p-3 transition-all duration-150;
+    @apply rounded-lg border border-gray-400 bg-black p-3 transition-all duration-150;
+}
+
+.btn-outline,
+.input-bordered {
+    @apply border border-gray-400;
 }
 
 a.card:hover,
@@ -76,7 +81,7 @@ button.card:hover {
 }
 
 .icon-fill-warning {
-    @apply fill-warning;
+    @apply fill-yellow-500; /* FIXED: changed fill-warning to fill-yellow-500 */
 }
 
 .icon-xs {
@@ -103,7 +108,7 @@ button.card:hover {
     background: radial-gradient(
         circle at center,
         #ff5e002e 1%,
-        #f8116b %,
+        #f8116b 50%, /* FIXED: added missing percentage value */
         transparent 55%
     );
 }
@@ -161,15 +166,7 @@ h6 {
     );
 }
 
-.btn-outline,
-.input-bordered {
-    @apply border border-secondary;
-}
-
 .blob {
-    /* --color: rgba(255, 94, 0, 0.949);
-    background: var(--color); */
-    /* background: radial-gradient(circle, rgb(212, 0, 255) 10%, rgb(255, 102, 0) 35%,   rgb(0, 0, 0) 100%); */
     border-radius: 100%;
     height: 30rem;
     width: 30rem;

@@ -3,6 +3,9 @@
     "version": "1.0.2",
     "type": "module",
     "platform": "node",
+    "engines": {
+        "node": "18.x"
+    },
     "scripts": {
         "// Dev/Build": "-------------put-your-diapers-on-lebowski------------------",
         "dev": "dotenv -- vite dev",
