@@ -25,6 +25,10 @@
         }
     };
 
+    const openSoloSwap = () => {
+        window.location.href = 'https://solo-swap-v2.vercel.app';
+    };
+
     onMount(() => {
         isBackpack =
             window?.localStorage?.getItem("walletAdapter") === '"Backpack"';
@@ -63,6 +67,14 @@
         {/if}
     </div>
     <div class="col-span-2 flex items-center justify-end">
+        <!-- Add the "try solo: swap" button -->
+        <button
+            class="btn btn-outline mr-3 hidden md:flex"
+            on:click={openSoloSwap}
+        >
+            <span class="text-sm lowercase">try solo: swap</span>
+        </button>
+        
         <div class="flex justify-end pr-2">
             <button
                 class="btn btn-ghost"

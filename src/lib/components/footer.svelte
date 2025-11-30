@@ -22,7 +22,7 @@
                 />
             </a> -->
             <a
-                href="https://solarplex.xyz/solo"
+                href="https://x.com/soloexplorerxyz"
                 class="btn btn-ghost lowercase"
             >
                 <Icon
