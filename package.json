@@ -4,7 +4,7 @@
     "type": "module",
     "platform": "node",
     "engines": {
-        "node": "24.x"
+        "node": "20.x"
     },
     "scripts": {
         "// Dev/Build": "-------------put-your-diapers-on-lebowski------------------",
