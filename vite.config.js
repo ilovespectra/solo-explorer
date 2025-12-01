@@ -1,8 +1,7 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 import pkg from "./package.json";
-
-const heliusKey = process.env.HELIUS_API_KEY;
 
 export default defineConfig(({ mode }) => ({
     build: {
@@ -18,5 +17,10 @@ export default defineConfig(({ mode }) => ({
             target: "es2020",
         },
     },
-    plugins: [sveltekit()],
+    plugins: [
+        sveltekit(),
+        nodePolyfills({
+            include: ["buffer", "process"], // Only include what you need
+        }),
+    ],
 }));
