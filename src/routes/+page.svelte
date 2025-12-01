@@ -60,7 +60,7 @@
                     class="mb-10 rounded-3xl border-4 border-black bg-white p-4"
                 >
                     <h1
-                        class="opacity-85 text-center text-5xl font-bold lowercase text-black"
+                        class="text-center text-5xl font-bold lowercase text-black opacity-85"
                     >
                         solo: explorer
                     </h1>
