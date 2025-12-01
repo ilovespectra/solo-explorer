@@ -4,15 +4,15 @@ import preprocess from "svelte-preprocess";
 /** @type {import("@sveltejs/kit").Config} */
 const config = {
     kit: {
-        adapter: adapter(),
+        // Explicitly specify the Node.js 20 runtime
+        adapter: adapter({
+            runtime: "nodejs20.x",
+        }),
     },
-
     preprocess: [
         preprocess({
             postcss: true,
-            typescript: {
-                tsconfigFile: "./tsconfig.json",
-            },
+            // The `tsconfigFile` option is typically not needed for svelte-preprocess
         }),
     ],
 };
