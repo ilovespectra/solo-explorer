@@ -66,7 +66,7 @@
         "eslint-plugin-write-good-comments": "^0.2.0",
         "husky": "^8.0.3",
         "lint-staged": "^13.2.2",
-        "npm-force-resolutions": "^0.0.17",
+        "npm-force-resolutions": "^0.0.10",
         "postcss": "^8.4.5",
         "postcss-load-config": "^4.0.1",
         "prettier": "^2.8.8",
